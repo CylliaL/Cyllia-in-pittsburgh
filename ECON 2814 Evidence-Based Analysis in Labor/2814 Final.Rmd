@@ -1,0 +1,257 @@
+### Q1.
+
+## a.
+# Monthly total bill of all three stores
+```{r}
+df <- read.csv("Coffee_Shop_Data_cleaned.csv")
+```
+```{r}
+library(dplyr)
+monthly_total_bill <- df %>%
+  group_by(Month) %>%
+  summarise(Total_Bill = sum(Total_Bill))
+
+library(ggplot2)
+ggplot(monthly_total_bill, aes(x = Month, y = Total_Bill)) +
+  geom_line(color = "steelblue") +  
+  labs(x = "Month", y = "Total Bill", title = "Monthly Total Bill") +
+  scale_x_continuous(breaks = 1:12, labels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")) +
+  theme_minimal()
+
+```
+
+# Monthly total bills of Tea of store 3
+```{r}
+Tea_3_df <- subset(df, product_category == "Tea" & store_id == 3)
+
+library(dplyr)
+monthly_total_bill <- Tea_3_df %>%
+  group_by(Month) %>%
+  summarise(Total_Bill = sum(Total_Bill))
+
+library(ggplot2)
+ggplot(monthly_total_bill, aes(x = Month, y = Total_Bill)) +
+  geom_line(color = "steelblue") +  
+  labs(x = "Month", y = "Total Bill", title = "Store 3 Monthly Total Bill of Tea") +
+  scale_x_continuous(breaks = 1:12, labels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")) +
+  theme_minimal()
+```
+# Monthly total bills of of store 3
+```{r}
+store_3_df <- subset(df, store_id == 3)
+
+library(dplyr)
+monthly_total_bill <- store_3_df %>%
+  group_by(Month) %>%
+  summarise(Total_Bill = sum(Total_Bill))
+
+library(ggplot2)
+ggplot(monthly_total_bill, aes(x = Month, y = Total_Bill)) +
+  geom_line(color = "steelblue") +  
+  labs(x = "Month", y = "Total Bill", title = "Store 3 Monthly Total Bill") +
+  scale_x_continuous(breaks = 1:12, labels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")) +
+  theme_minimal()
+```
+
+## b.
+```{r}
+library(dplyr)
+sales_by_category <- df %>%
+  group_by(store_id, product_category) %>%
+  summarise(Total_Sales = sum(Total_Bill))
+```
+
+```{r}
+library(ggplot2)
+ggplot(sales_by_category, aes(x = product_category, y = Total_Sales, fill = factor(store_id))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "Product Category", y = "Total Sales", title = "Sales by Product Category for Stores 3, 5, and 8") +
+  scale_fill_discrete(name = "Store ID") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+## c.
+# line chart
+```{r}
+library(dplyr)
+sales_by_hour <- df %>%
+  group_by(Hour) %>%
+  summarise(Total_Sales = sum(Total_Bill))
+
+library(ggplot2)
+ggplot(sales_by_hour, aes(x = Hour, y = Total_Sales)) +
+  geom_line(color = "steelblue", size = 1) +
+  geom_point(color = "steelblue", size = 3) +
+  labs(x = "Hour of the Day", y = "Total Sales", title = "Sales by Hour") +
+  scale_x_continuous(breaks = seq(0, 23, by = 1)) +
+  theme_minimal()
+```
+# heat map
+```{r}
+library(ggplot2)
+ggplot(sales_by_hour, aes(x = factor(Hour), y = 1, fill = Total_Sales)) +
+  geom_tile(color = "white", size = 0.5) +
+  scale_fill_gradient(low = "white", high = "steelblue") +
+  labs(x = "Hour of the Day", y = "", title = "Sales by Hour") +
+  theme_minimal() +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid = element_blank())
+```
+# lollipop chart
+```{r}
+library(ggplot2)
+ggplot(sales_by_hour, aes(x = factor(Hour), y = Total_Sales)) +
+  geom_point(color = "steelblue", size = 4) +
+  geom_segment(aes(x = factor(Hour), xend = factor(Hour), y = 0, yend = Total_Sales), color = "steelblue") +
+  labs(x = "Hour of the Day", y = "Total Sales", title = "Sales by Hour") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Q2. 
+```{r}
+# install.packages("randomForest")
+library(randomForest)
+library(dplyr)
+```
+```{r}
+tea_sales <- df %>%
+  filter(product_category == "Tea") %>%
+  group_by(store_id, Day.of.Week, Hour) %>%
+  summarise(Total_Bill = sum(Total_Bill))
+```
+```{r}
+set.seed(123)  
+train_index <- sample(nrow(tea_sales), 0.7 * nrow(tea_sales))
+train_data <- tea_sales[train_index, ]
+test_data <- tea_sales[-train_index, ]
+```
+```{r}
+rf_model <- randomForest(Total_Bill ~ store_id + Day.of.Week + Hour,
+                         data = train_data,
+                         ntree = 500,
+                         mtry = 2,
+                         importance = TRUE)
+```
+
+```{r}
+# Make predictions on the test data
+predictions <- predict(rf_model, newdata = test_data)
+
+# Calculate the mean squared error (MSE)
+mse <- mean((test_data$Total_Bill - predictions)^2)
+print(paste0("Mean Squared Error (MSE): ", mse))
+
+# Calculate the root mean squared error (RMSE)
+rmse <- sqrt(mse)
+print(paste0("Root Mean Squared Error (RMSE): ", rmse))
+
+# Calculate the R-squared (R^2)
+r_squared <- 1 - (sum((test_data$Total_Bill - predictions)^2) / sum((test_data$Total_Bill - mean(test_data$Total_Bill))^2))
+print(paste0("R-squared (R^2): ", r_squared))
+```
+```{r}
+importance_scores <- importance(rf_model)
+print(importance_scores)
+```
+```{r}
+new_data <- data.frame(
+  store_id = c(3, 5, 8),
+  Day.of.Week = rep("Wednesday", 3),
+  Hour = rep(11, 3)
+)
+```
+```{r}
+predictions <- predict(rf_model, newdata = new_data)
+
+results <- data.frame(new_data, Total_Bill = predictions)
+print(results)
+```
+
+### Extra Credit
+```{r}
+new_data <- data.frame(
+  store_id = rep(3, 15),  
+  Day.of.Week = rep(2,15), 
+  Name.Day = ("Wednesday"),
+  product_catery = ("Tea"),
+  Hour = seq(6, 20)
+)
+```
+```{r}
+predictions <- predict(rf_model, newdata = new_data)
+results <- data.frame(new_data, Total_Bill = predictions)
+results
+```
+```{r}
+library(ggplot2)
+# Line plot
+ggplot(results, aes(x = Hour, y = Total_Bill)) +
+  geom_line(color = "steelblue", size = 1) +
+  geom_point(color = "steelblue", size = 3) +
+  labs(x = "Hour of the Day", y = "Predicted Total Bill", title = "Predicted Sales of Tea Across Wednesday") +
+  scale_x_continuous(breaks = seq(0, 23, by = 1)) +
+  theme_minimal()
+```
+```{r}
+# Bar plot
+ggplot(results, aes(x = factor(Hour), y = Total_Bill)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(x = "Hour of the Day", y = "Predicted Total Bill", title = "Predicted Sales of Tea Across Wednesday") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
