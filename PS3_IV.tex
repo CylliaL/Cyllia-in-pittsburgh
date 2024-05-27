@@ -1,0 +1,1106 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Problem Set 3: Instrumental Variables Key},
+  pdfauthor={Claire Duquennois},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Problem Set 3: Instrumental Variables Key}
+\author{Claire Duquennois}
+\date{}
+
+\begin{document}
+\maketitle
+
+\textbf{\emph{Name: }} Xiang Li
+
+\hypertarget{empirical-analysis-using-data-from-ananat-2011-aejae}{%
+\section{1. Empirical Analysis using Data from Ananat (2011,
+AEJ:AE)}\label{empirical-analysis-using-data-from-ananat-2011-aejae}}
+
+This exercise uses data from Elizabeth Ananat's paper, ``The Wrong
+Side(s) of the Tracks: The Causal Effects of Racial Segregation on Urban
+Poverty and Inequality,'' published in the \emph{American Economic
+Journal: Applied Economics} in 2011. This paper studies how segregation
+has affected population characteristics and income disparity in US
+cities using the layout of railroad tracks as an instrumental variable.
+
+\hypertarget{finding-the-data}{%
+\section{2. Finding the data}\label{finding-the-data}}
+
+The data can be found by following the link on the AEJ: Applied
+Economics' website which will take you to the ICPSR's data repository.
+You will need to sign in to get access to the data files. Once logged
+in, you will find the set of files that are typically included in a
+replication file. These include several datasets, several .do files
+(which is a STATA command file). For this assignment we will be using
+the\texttt{aej\_maindata.dta} file.
+
+\clearpage
+
+\hypertarget{set-up-and-opening-the-data}{%
+\section{3. Set up and opening the
+data}\label{set-up-and-opening-the-data}}
+
+\hypertarget{question-load-any-packages-you-will-need-and-the-data-contained-in-the-aej_maindata.dta-file.-how-many-observations-are-contained-in-the-data.-what-is-the-level-of-an-observation}{%
+\subsection{\texorpdfstring{3.1 Question: Load any packages you will
+need and the data contained in the \texttt{aej\_maindata.dta} file. How
+many observations are contained in the data. What is the level of an
+observation?}{3.1 Question: Load any packages you will need and the data contained in the aej\_maindata.dta file. How many observations are contained in the data. What is the level of an observation?}}\label{question-load-any-packages-you-will-need-and-the-data-contained-in-the-aej_maindata.dta-file.-how-many-observations-are-contained-in-the-data.-what-is-the-level-of-an-observation}}
+
+\textbf{Code and Answer:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(}\StringTok{"haven"}\NormalTok{)}
+\FunctionTok{library}\NormalTok{(}\StringTok{"dplyr"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## 载入程辑包：'dplyr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(}\StringTok{"stargazer"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Please cite as:
+\end{verbatim}
+
+\begin{verbatim}
+##  Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+\end{verbatim}
+
+\begin{verbatim}
+##  R package version 5.2.3. https://CRAN.R-project.org/package=stargazer
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(}\StringTok{"lfe"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 载入需要的程辑包：Matrix
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: 程辑包'Matrix'是用R版本4.3.2 来建造的
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{maindata }\OtherTok{\textless{}{-}} \FunctionTok{read\_dta}\NormalTok{(}\StringTok{"aej\_maindata.dta"}\NormalTok{)}
+\FunctionTok{nrow}\NormalTok{(maindata)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 121
+\end{verbatim}
+
+Answer: There are 121 observations are contained in the data, it's a
+city level of an observation.
+
+\clearpage
+
+\hypertarget{data-description}{%
+\section{4. Data Description}\label{data-description}}
+
+\hypertarget{questionthe-dataset-contains-many-variables-some-of-which-are-not-used-in-this-exercise.-keep-the-following-variables-in-the-final-dataset-hint-use-the-select-function-in-dplyr.}{%
+\subsection{\texorpdfstring{4.1 Question:The dataset contains many
+variables, some of which are not used in this exercise. Keep the
+following variables in the final dataset (Hint: use the \texttt{select}
+function in
+\texttt{dplyr}).}{4.1 Question:The dataset contains many variables, some of which are not used in this exercise. Keep the following variables in the final dataset (Hint: use the select function in dplyr).}}\label{questionthe-dataset-contains-many-variables-some-of-which-are-not-used-in-this-exercise.-keep-the-following-variables-in-the-final-dataset-hint-use-the-select-function-in-dplyr.}}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1220}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8780}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Name
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+dism1990 & 1990 dissimilarity index \\
+herf & RDI (Railroad division index) \\
+lenper & Track length per square km \\
+povrate\_w & White poverty rate 1990 \\
+povrate\_b & Black poverty rate 1990 \\
+area1910 & Physical area in 1910 (1000 sq. miles) \\
+count1910 & Population in 1910 (1000s) \\
+ethseg10 & Ethnic Dissimilariy index in 1910 \\
+ethiso10 & Ethnic isolation index in 1910 \\
+black1910 & Percent Black in 1910 \\
+passpc & Street cars per capita 1915 \\
+black1920 & Percent Black 1920 \\
+lfp1920 & Labor Force Participation 1920 \\
+incseg & Income segregation 1990 \\
+pctbk1990 & Percent Black 1990 \\
+manshr & Share employed in manufacturing 1990 \\
+pop1990 & Population in 1990 \\
+\end{longtable}
+
+\textbf{You can find the detailed description of each variable in the
+original paper. }
+
+\textbf{Code:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dataselect }\OtherTok{\textless{}{-}} \FunctionTok{select}\NormalTok{(maindata, dism1990, herf, lenper, povrate\_w, povrate\_b, area1910, count1910, ethseg10, ethiso10, black1910, passpc, black1920, lfp1920, incseg, pctbk1990, manshr, pop1990)}
+\end{Highlighting}
+\end{Shaded}
+
+\clearpage
+
+\hypertarget{summary-statistics}{%
+\section{5. Summary Statistics:}\label{summary-statistics}}
+
+\hypertarget{question-report-summary-statistics-of-the-following-variables-in-the-datasetdism1990-herf-lenper-povrate_w-povrate_b.-present-these-summary-statistics-in-a-formatted-table-you-can-use-stargazer-or-other-packages.}{%
+\subsection{\texorpdfstring{5.1 Question: Report summary statistics of
+the following variables in the dataset:``dism1990'', ``herf'',
+``lenper'', ``povrate\_w'', ``povrate\_b''. Present these summary
+statistics in a formatted table, you can use \texttt{stargazer} or other
+packages.}{5.1 Question: Report summary statistics of the following variables in the dataset:``dism1990'', ``herf'', ``lenper'', ``povrate\_w'', ``povrate\_b''. Present these summary statistics in a formatted table, you can use stargazer or other packages.}}\label{question-report-summary-statistics-of-the-following-variables-in-the-datasetdism1990-herf-lenper-povrate_w-povrate_b.-present-these-summary-statistics-in-a-formatted-table-you-can-use-stargazer-or-other-packages.}}
+
+\textbf{Code:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(dataselect)}
+\NormalTok{selected\_vars }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"dism1990"}\NormalTok{, }\StringTok{"herf"}\NormalTok{, }\StringTok{"lenper"}\NormalTok{, }\StringTok{"povrate\_w"}\NormalTok{, }\StringTok{"povrate\_b"}\NormalTok{)}
+\FunctionTok{stargazer}\NormalTok{(data[, selected\_vars], }\AttributeTok{type =} \StringTok{"text"}\NormalTok{, }\AttributeTok{digits=}\DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## =========================================
+## Statistic  N  Mean  St. Dev.  Min    Max 
+## -----------------------------------------
+## dism1990  121 0.569  0.135   0.329  0.873
+## herf      121 0.723  0.141   0.238  0.987
+## lenper    121 0.001  0.001   0.0002 0.013
+## povrate_w 121 0.095  0.035   0.035  0.216
+## povrate_b 121 0.264  0.080   0.093  0.504
+## -----------------------------------------
+\end{verbatim}
+
+\clearpage
+
+\hypertarget{reduced-form}{%
+\section{6. Reduced Form:}\label{reduced-form}}
+
+\hypertarget{question-we-are-interested-in-understanding-how-segregation-affects-population-characteristics-and-income-disparity-in-us-cities.-we-will-focus-on-two-outcome-variables-the-poverty-rate-for-blacks-and-whites.-regress-these-two-outcome-variables-on-segregation-in-1990-our-explanatory-variable-and-interpret-your-results.-report-robust-standard-errors.-make-sure-you-specify-the-units-of-measurement-in-your-interpretation.}{%
+\subsection{6.1 Question: We are interested in understanding how
+segregation affects population characteristics and income disparity in
+US cities. We will focus on two outcome variables: the poverty rate for
+blacks and whites. Regress these two outcome variables on segregation in
+1990, our explanatory variable, and interpret your results. Report
+robust standard errors. Make sure you specify the units of measurement
+in your
+interpretation.}\label{question-we-are-interested-in-understanding-how-segregation-affects-population-characteristics-and-income-disparity-in-us-cities.-we-will-focus-on-two-outcome-variables-the-poverty-rate-for-blacks-and-whites.-regress-these-two-outcome-variables-on-segregation-in-1990-our-explanatory-variable-and-interpret-your-results.-report-robust-standard-errors.-make-sure-you-specify-the-units-of-measurement-in-your-interpretation.}}
+
+\textbf{Code:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#install.packages("lmtest", "sandwich")}
+\FunctionTok{library}\NormalTok{(lmtest)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: 程辑包'lmtest'是用R版本4.3.2 来建造的
+\end{verbatim}
+
+\begin{verbatim}
+## 载入需要的程辑包：zoo
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## 载入程辑包：'zoo'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     as.Date, as.Date.numeric
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## 载入程辑包：'lmtest'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:lfe':
+## 
+##     waldtest
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(sandwich)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Regress the two outcome variables on segregation in 1990}
+
+\NormalTok{model.black }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(povrate\_b }\SpecialCharTok{\textasciitilde{}}\NormalTok{ dism1990, }\AttributeTok{data =}\NormalTok{ data)}
+\NormalTok{model.white }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(povrate\_w }\SpecialCharTok{\textasciitilde{}}\NormalTok{ dism1990, }\AttributeTok{data =}\NormalTok{ data)}
+
+\FunctionTok{stargazer}\NormalTok{(model.black, model.white, }\AttributeTok{header =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{type =} \StringTok{"text"}\NormalTok{, }\AttributeTok{se =} \FunctionTok{list}\NormalTok{(model.black}\SpecialCharTok{$}\NormalTok{rse, model.white}\SpecialCharTok{$}\NormalTok{rse))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## ===========================================================
+##                                    Dependent variable:     
+##                                ----------------------------
+##                                  povrate_b      povrate_w  
+##                                     (1)            (2)     
+## -----------------------------------------------------------
+## dism1990                          0.182***      -0.073***  
+##                                   (0.051)        (0.022)   
+##                                                            
+## Constant                          0.161***      0.136***   
+##                                   (0.030)        (0.013)   
+##                                                            
+## -----------------------------------------------------------
+## Observations                        121            121     
+## R2                                 0.095          0.081    
+## Adjusted R2                        0.088          0.074    
+## Residual Std. Error (df = 119)     0.076          0.033    
+## F Statistic (df = 1; 119)        12.511***      10.538***  
+## ===========================================================
+## Note:                           *p<0.1; **p<0.05; ***p<0.01
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Report robust standard errors}
+
+\NormalTok{robust\_black }\OtherTok{\textless{}{-}} \FunctionTok{coeftest}\NormalTok{(model.black, }\AttributeTok{vcov =}\NormalTok{ vcovHC)}
+\NormalTok{robust\_white }\OtherTok{\textless{}{-}} \FunctionTok{coeftest}\NormalTok{(model.white, }\AttributeTok{vcov =}\NormalTok{ vcovHC)}
+
+\FunctionTok{stargazer}\NormalTok{(robust\_black, robust\_white, }\AttributeTok{header =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{type =} \StringTok{"text"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## =====================================
+##              Dependent variable:     
+##          ----------------------------
+##                                      
+##               (1)            (2)     
+## -------------------------------------
+## dism1990    0.182***      -0.073***  
+##             (0.046)        (0.020)   
+##                                      
+## Constant    0.161***      0.136***   
+##             (0.029)        (0.012)   
+##                                      
+## =====================================
+## =====================================
+## Note:     *p<0.1; **p<0.05; ***p<0.01
+\end{verbatim}
+
+\textbf{Answer:} The segregation in 1990 and the poverty rate for blacks
+is positive related, which means with 1 unit increasing of segregation,
+the poverty rate for blacks is expected to increase by 0.182 percentage
+points. The segregation in 1990 and the poverty rate for whites is
+negative related, which means with 1 unit increasing of segregation, the
+poverty rate for whites is expected to decrease by 0.073 percentage
+points.
+
+\clearpage
+
+\hypertarget{question-explain-the-problem-with-giving-a-causal-interpretation-to-the-estimates-you-just-produced.-give-examples-of-specific-factors-that-might-make-a-causal-interpretation-of-your-result-problematic.}{%
+\subsection{6.2 Question: Explain the problem with giving a causal
+interpretation to the estimates you just produced. Give examples of
+specific factors that might make a causal interpretation of your result
+problematic.}\label{question-explain-the-problem-with-giving-a-causal-interpretation-to-the-estimates-you-just-produced.-give-examples-of-specific-factors-that-might-make-a-causal-interpretation-of-your-result-problematic.}}
+
+\textbf{Answer:}
+
+\clearpage
+
+\hypertarget{validity-of-the-instrument}{%
+\section{7. Validity of the
+instrument:}\label{validity-of-the-instrument}}
+
+\hypertarget{question-estimate-the-following-regression-and-interpret-its-coefficients}{%
+\subsection{7.1 Question: Estimate the following regression and
+interpret it's
+coefficients,}\label{question-estimate-the-following-regression-and-interpret-its-coefficients}}
+
+\[
+ dism1990_i=\beta_0+\beta_1RDI_i+\beta_2 tracklength_i+\epsilon.
+\]
+
+\textbf{Code:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{reg.dism }\OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(dism1990 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ herf }\SpecialCharTok{+}\NormalTok{ lenper, data)}
+\FunctionTok{stargazer}\NormalTok{(reg.dism, }\AttributeTok{header =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{type =} \StringTok{"text"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## ===============================================
+##                         Dependent variable:    
+##                     ---------------------------
+##                              dism1990          
+## -----------------------------------------------
+## herf                         0.357***          
+##                               (0.081)          
+##                                                
+## lenper                       18.514**          
+##                               (9.126)          
+##                                                
+## Constant                     0.294***          
+##                               (0.058)          
+##                                                
+## -----------------------------------------------
+## Observations                    121            
+## R2                             0.203           
+## Adjusted R2                    0.189           
+## Residual Std. Error      0.122 (df = 118)      
+## ===============================================
+## Note:               *p<0.1; **p<0.05; ***p<0.01
+\end{verbatim}
+
+\textbf{Answer:}
+
+\clearpage
+
+\hypertarget{question-re-estimate-the-specification-above-using-the-scale-command-around-the-variables-you-wish-to-standardize-in-the-regression.-what-do-you-notice}{%
+\subsection{\texorpdfstring{7.2 Question: Re-estimate the specification
+above using the \texttt{scale()} command around the variables you wish
+to standardize in the regression. What do you
+notice?}{7.2 Question: Re-estimate the specification above using the scale() command around the variables you wish to standardize in the regression. What do you notice?}}\label{question-re-estimate-the-specification-above-using-the-scale-command-around-the-variables-you-wish-to-standardize-in-the-regression.-what-do-you-notice}}
+
+\textbf{Code:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{reg.sd }\OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(dism1990 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ herf }\SpecialCharTok{+} \FunctionTok{scale}\NormalTok{(lenper), data)}
+\FunctionTok{stargazer}\NormalTok{(reg.sd, }\AttributeTok{header =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{type =} \StringTok{"text"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## ===============================================
+##                         Dependent variable:    
+##                     ---------------------------
+##                              dism1990          
+## -----------------------------------------------
+## herf                         0.357***          
+##                               (0.081)          
+##                                                
+## scale(lenper)                 0.023**          
+##                               (0.012)          
+##                                                
+## Constant                     0.310***          
+##                               (0.060)          
+##                                                
+## -----------------------------------------------
+## Observations                    121            
+## R2                             0.203           
+## Adjusted R2                    0.189           
+## Residual Std. Error      0.122 (df = 118)      
+## ===============================================
+## Note:               *p<0.1; **p<0.05; ***p<0.01
+\end{verbatim}
+
+\textbf{Answer:}
+
+\clearpage
+
+\hypertarget{question-in-the-context-of-instrumental-variables-what-is-this-regression-referred-to-as-and-why-is-it-important}{%
+\subsection{7.3 Question: In the context of instrumental variables, what
+is this regression referred to as and why is it
+important?}\label{question-in-the-context-of-instrumental-variables-what-is-this-regression-referred-to-as-and-why-is-it-important}}
+
+\textbf{Answer:} This referred to first stage explantery power explain
+in some way to segregation, RDI to be a good instrument
+
+\clearpage
+
+\hypertarget{question-illustrate-the-relationship-between-the-rdi-and-segregation-graphically.}{%
+\subsection{7.4 Question: Illustrate the relationship between the RDI
+and segregation
+graphically.}\label{question-illustrate-the-relationship-between-the-rdi-and-segregation-graphically.}}
+
+\textbf{Code:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: 程辑包'ggplot2'是用R版本4.3.2 来建造的
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{plotted }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ data, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ herf, }\AttributeTok{y =}\NormalTok{ dism1990, }\AttributeTok{color =}\NormalTok{ variable)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ dism1990), }\AttributeTok{color =} \StringTok{"gold"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ dism1990, }\AttributeTok{col =} \StringTok{"dism1990"}\NormalTok{), }\AttributeTok{se =}\NormalTok{ F, }\AttributeTok{color =} \StringTok{"orange"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_bw}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"The Relationship Between the RDI and Segregation"}\NormalTok{, }\AttributeTok{x =} \StringTok{"RDI"}\NormalTok{, }\AttributeTok{y =} \StringTok{"dism1990"}\NormalTok{, }\AttributeTok{color =} \StringTok{"Regressand Variable"}\NormalTok{)}
+ 
+\NormalTok{plotted}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `geom_smooth()` using formula = 'y ~ x'
+\end{verbatim}
+
+\includegraphics{PS3_IV_files/figure-latex/unnamed-chunk-10-1.pdf}
+
+\clearpage
+
+\hypertarget{question-is-there-a-concern-that-this-might-be-a-weak-instrument-why-would-this-be-a-problem}{%
+\subsection{7.5 Question: Is there a concern that this might be a weak
+instrument? Why would this be a
+problem?}\label{question-is-there-a-concern-that-this-might-be-a-weak-instrument-why-would-this-be-a-problem}}
+
+\textbf{Answer:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(reg.sd)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+##    felm(formula = dism1990 ~ herf + scale(lenper), data = data) 
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.22582 -0.10817  0.00864  0.08031  0.32113 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)    0.31025    0.05984   5.185 9.05e-07 ***
+## herf           0.35731    0.08130   4.395 2.43e-05 ***
+## scale(lenper)  0.02333    0.01150   2.029   0.0447 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.1218 on 118 degrees of freedom
+## Multiple R-squared(full model): 0.2025   Adjusted R-squared: 0.189 
+## Multiple R-squared(proj model): 0.2025   Adjusted R-squared: 0.189 
+## F-statistic(full model):14.98 on 2 and 118 DF, p-value: 1.591e-06 
+## F-statistic(proj model): 14.98 on 2 and 118 DF, p-value: 1.591e-06
+\end{verbatim}
+
+f stasistic compare to 10 greater not weak
+
+\clearpage
+
+\hypertarget{question-select-a-number-of-relevant-city-characteristics-in-the-data-to-regress-on-the-rdi-and-track-length.-present-your-results-and-interpret-your-findings.-why-do-these-results-matter-for-answering-our-question-of-interest}{%
+\subsection{7.6 Question: Select a number of relevant city
+characteristics in the data to regress on the RDI and track length.
+Present your results and interpret your findings. Why do these results
+matter for answering our question of
+interest?}\label{question-select-a-number-of-relevant-city-characteristics-in-the-data-to-regress-on-the-rdi-and-track-length.-present-your-results-and-interpret-your-findings.-why-do-these-results-matter-for-answering-our-question-of-interest}}
+
+\textbf{Code and Answer:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{reg}\FloatTok{.1} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(area1910 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ herf }\SpecialCharTok{+}\NormalTok{ lenper, data)}
+\NormalTok{reg}\FloatTok{.2} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(count1910 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ herf }\SpecialCharTok{+}\NormalTok{ lenper, data)}
+\NormalTok{reg}\FloatTok{.3} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(black1910 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ herf }\SpecialCharTok{+}\NormalTok{ lenper, data)}
+\NormalTok{reg}\FloatTok{.4} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(ethseg10 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ herf }\SpecialCharTok{+}\NormalTok{ lenper, data)}
+\NormalTok{reg}\FloatTok{.5} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(ethiso10 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ herf }\SpecialCharTok{+}\NormalTok{ lenper, data)}
+
+
+\FunctionTok{stargazer}\NormalTok{(reg}\FloatTok{.1}\NormalTok{, reg}\FloatTok{.2}\NormalTok{, reg}\FloatTok{.3}\NormalTok{, reg}\FloatTok{.4}\NormalTok{, reg}\FloatTok{.5}\NormalTok{, }\AttributeTok{header =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{type =} \StringTok{"text"}\NormalTok{, }\AttributeTok{title =} \StringTok{"impact of city characteristics on RDI"}\NormalTok{, }\AttributeTok{se =} \FunctionTok{list}\NormalTok{(reg}\FloatTok{.1}\SpecialCharTok{$}\NormalTok{rse, reg}\FloatTok{.2}\SpecialCharTok{$}\NormalTok{rse, reg}\FloatTok{.4}\SpecialCharTok{$}\NormalTok{rse, reg}\FloatTok{.5}\SpecialCharTok{$}\NormalTok{rse))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## impact of city characteristics on RDI
+## ==============================================================================================================
+##                                                        Dependent variable:                                    
+##                     ------------------------------------------------------------------------------------------
+##                           area1910            count1910          black1910        ethseg10        ethiso10    
+##                             (1)                  (2)                (3)              (4)             (5)      
+## --------------------------------------------------------------------------------------------------------------
+## herf                     -3,992.637            665.751             -0.001           0.076           0.027     
+##                         (11,986.490)         (1,362.964)          (0.185)          (0.070)         (0.086)    
+##                                                                                                               
+## lenper                  -574,401.000          75,553.190           9.236           15.343          -12.439    
+##                        (553,669.000)        (134,814.900)         (53.248)        (17.288)        (19.930)    
+##                                                                                                               
+## Constant                18,409.570**           976.876             0.007          0.238***          0.048     
+##                         (8,612.320)           (927.189)           (0.121)          (0.051)         (0.054)    
+##                                                                                                               
+## --------------------------------------------------------------------------------------------------------------
+## Observations                 58                  121                121              49              49       
+## R2                         0.007                0.006              0.290            0.014           0.009     
+## Adjusted R2                -0.029               -0.011             0.278           -0.029          -0.034     
+## Residual Std. Error 15,050.340 (df = 55) 1,903.415 (df = 118) 0.018 (df = 118) 0.184 (df = 46) 0.075 (df = 46)
+## ==============================================================================================================
+## Note:                                                                              *p<0.1; **p<0.05; ***p<0.01
+\end{verbatim}
+
+resctriction collusion hold
+
+\clearpage
+
+\hypertarget{question-what-are-the-two-conditions-necessary-for-a-valid-instrument-what-evidence-do-you-have-that-the-rdi-meet-these-conditions-be-specific-in-supporting-this-claim.}{%
+\subsection{7.7 Question: What are the two conditions necessary for a
+valid instrument? What evidence do you have that the RDI meet these
+conditions? Be specific in supporting this
+claim.}\label{question-what-are-the-two-conditions-necessary-for-a-valid-instrument-what-evidence-do-you-have-that-the-rdi-meet-these-conditions-be-specific-in-supporting-this-claim.}}
+
+\textbf{Answer:} Cov(z, x\_1) != 0 (the first stage) Cov(z, v) = 0 (the
+exclusion restriction) y:poverty rate x\_1: dism1990(segregation) z:
+herf(RDI) v: city characteristics
+
+first stage quite strong 很显著 in paper why RDI made the conditions
+
+\clearpage
+
+\hypertarget{question-do-you-believe-the-instrument-is-valid-whywhy-not}{%
+\subsection{7.8 Question: Do you believe the instrument is valid?
+Why/why
+not?}\label{question-do-you-believe-the-instrument-is-valid-whywhy-not}}
+
+\textbf{Answer:} something elso 也许有其他的可以影响，RDI
+也许通过其他因素影响 poverty rate
+
+\clearpage
+
+\hypertarget{question-generate-a-table-that-estimates-the-effect-of-segregation-on-the-poverty-rate-for-blacks-and-whites-by-ols-and-then-using-the-rdi-instrument.-make-sure-you-report-robust-standard-errors.-how-does-the-use-of-the-rdi-instrument-change-the-estimated-coefficients}{%
+\subsection{7.9 Question: Generate a table that estimates the effect of
+segregation on the poverty rate for blacks and whites by OLS and then
+using the RDI instrument. Make sure you report robust standard errors.
+How does the use of the RDI instrument change the estimated
+coefficients?}\label{question-generate-a-table-that-estimates-the-effect-of-segregation-on-the-poverty-rate-for-blacks-and-whites-by-ols-and-then-using-the-rdi-instrument.-make-sure-you-report-robust-standard-errors.-how-does-the-use-of-the-rdi-instrument-change-the-estimated-coefficients}}
+
+\textbf{Code and Answer:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{model.black.ols }\OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(povrate\_b }\SpecialCharTok{\textasciitilde{}}\NormalTok{ dism1990, }\AttributeTok{data =}\NormalTok{ data)}
+\NormalTok{model.white.ols }\OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(povrate\_w }\SpecialCharTok{\textasciitilde{}}\NormalTok{ dism1990, }\AttributeTok{data =}\NormalTok{ data)}
+
+\NormalTok{model.black.RDI }\OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(povrate\_b }\SpecialCharTok{\textasciitilde{}}\NormalTok{ lenper}\SpecialCharTok{|}\DecValTok{0}\SpecialCharTok{|}\NormalTok{(dism1990 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ herf), }\AttributeTok{data =}\NormalTok{ data)}
+\NormalTok{model.white.RDI }\OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(povrate\_w }\SpecialCharTok{\textasciitilde{}}\NormalTok{ lenper}\SpecialCharTok{|}\DecValTok{0}\SpecialCharTok{|}\NormalTok{(dism1990 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ herf), }\AttributeTok{data =}\NormalTok{ data)}
+
+\FunctionTok{stargazer}\NormalTok{(model.black.ols, model.white.ols, model.black.RDI, model.white.RDI, }\AttributeTok{header =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{type =} \StringTok{"text"}\NormalTok{, }\AttributeTok{se =} \FunctionTok{list}\NormalTok{(model.black.ols}\SpecialCharTok{$}\NormalTok{rse, model.white.ols}\SpecialCharTok{$}\NormalTok{rse,model.black.RDI}\SpecialCharTok{$}\NormalTok{rse, model.white.RDI}\SpecialCharTok{$}\NormalTok{rse))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## =======================================================================================
+##                                             Dependent variable:                        
+##                     -------------------------------------------------------------------
+##                        povrate_b        povrate_w        povrate_b        povrate_w    
+##                           (1)              (2)              (3)              (4)       
+## ---------------------------------------------------------------------------------------
+## dism1990                0.182***        -0.073***                                      
+##                         (0.045)          (0.019)                                       
+##                                                                                        
+## lenper                                                     -4.780           0.602      
+##                                                           (3.067)          (1.970)     
+##                                                                                        
+## `dism1990(fit)`                                           0.258**         -0.196***    
+##                                                           (0.108)          (0.065)     
+##                                                                                        
+## Constant                0.161***         0.136***         0.121**          0.205***    
+##                         (0.029)          (0.012)          (0.061)          (0.037)     
+##                                                                                        
+## ---------------------------------------------------------------------------------------
+## Observations              121              121              121              121       
+## R2                       0.095            0.081            0.084            -0.150     
+## Adjusted R2              0.088            0.074            0.068            -0.170     
+## Residual Std. Error 0.076 (df = 119) 0.033 (df = 119) 0.077 (df = 118) 0.037 (df = 118)
+## =======================================================================================
+## Note:                                                       *p<0.1; **p<0.05; ***p<0.01
+\end{verbatim}
+
+\clearpage
+
+\hypertarget{question-what-is-the-reduced-form-equation}{%
+\subsection{7.10 Question: What is the reduced form
+equation?}\label{question-what-is-the-reduced-form-equation}}
+
+\textbf{Answer:} \[
+povrateblack_i = \pi_i0 + \pi_1 \times herf_i + \eta\\
+povratewhite_i = \gamma_i0 + \gamma_1 \times herf_i + \eta
+\]
+
+\clearpage
+
+\hypertarget{question-2-pages-for-the-two-poverty-rates-estimate-the-reduced-form-on-all-the-cities-and-illustrate-the-reduced-form-relationships-graphically.}{%
+\subsection{7.11 Question: (2 pages) For the two poverty rates, estimate
+the reduced form on all the cities and illustrate the reduced form
+relationships
+graphically.}\label{question-2-pages-for-the-two-poverty-rates-estimate-the-reduced-form-on-all-the-cities-and-illustrate-the-reduced-form-relationships-graphically.}}
+
+\textbf{Code:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{model.black.rf }\OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(povrate\_b }\SpecialCharTok{\textasciitilde{}}\NormalTok{ herf, }\AttributeTok{data =}\NormalTok{ data)}
+\NormalTok{model.white.rf }\OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(povrate\_w }\SpecialCharTok{\textasciitilde{}}\NormalTok{ herf, }\AttributeTok{data =}\NormalTok{ data)}
+
+\FunctionTok{stargazer}\NormalTok{(model.black.rf, model.white.rf, }\AttributeTok{header =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{type =} \StringTok{"text"}\NormalTok{, }\AttributeTok{se =} \FunctionTok{list}\NormalTok{(model.black.rf}\SpecialCharTok{$}\NormalTok{rse, model.white.rf}\SpecialCharTok{$}\NormalTok{rse))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## ===========================================================
+##                                    Dependent variable:     
+##                                ----------------------------
+##                                  povrate_b      povrate_w  
+##                                     (1)            (2)     
+## -----------------------------------------------------------
+## herf                              0.092**       -0.077***  
+##                                   (0.046)        (0.022)   
+##                                                            
+## Constant                          0.197***      0.150***   
+##                                   (0.036)        (0.017)   
+##                                                            
+## -----------------------------------------------------------
+## Observations                        121            121     
+## R2                                 0.027          0.099    
+## Adjusted R2                        0.019          0.092    
+## Residual Std. Error (df = 119)     0.079          0.033    
+## ===========================================================
+## Note:                           *p<0.1; **p<0.05; ***p<0.01
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{plotted }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ data, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ herf, }\AttributeTok{y =}\NormalTok{ dism1990, }\AttributeTok{color =}\NormalTok{ variable)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ dism1990), }\AttributeTok{color =} \StringTok{"gold"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ dism1990, }\AttributeTok{col =} \StringTok{"dism1990"}\NormalTok{), }\AttributeTok{se =}\NormalTok{ F, }\AttributeTok{color =} \StringTok{"orange"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_bw}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"The Relationship Between the RDI and Segregation"}\NormalTok{, }\AttributeTok{x =} \StringTok{"RDI"}\NormalTok{, }\AttributeTok{y =} \StringTok{"dism1990"}\NormalTok{, }\AttributeTok{color =} \StringTok{"Regressand Variable"}\NormalTok{)}
+ 
+\NormalTok{plotted}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `geom_smooth()` using formula = 'y ~ x'
+\end{verbatim}
+
+\includegraphics{PS3_IV_files/figure-latex/unnamed-chunk-15-1.pdf}
+
+\clearpage
+
+\hypertarget{question-generate-a-table-with-at-least-six-estimations-that-checks-whether-the-main-results-are-robust-to-adding-additional-controls-for-city-characteristics.-what-do-you-conclude}{%
+\subsection{7.12 Question: Generate a table with at least six
+estimations that checks whether the main results are robust to adding
+additional controls for city characteristics. What do you
+conclude?}\label{question-generate-a-table-with-at-least-six-estimations-that-checks-whether-the-main-results-are-robust-to-adding-additional-controls-for-city-characteristics.-what-do-you-conclude}}
+
+\textbf{Code:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{reg}\FloatTok{.71} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(povrate\_w }\SpecialCharTok{\textasciitilde{}}\NormalTok{ lenper}\SpecialCharTok{|}\DecValTok{0}\SpecialCharTok{|}\NormalTok{(dism1990 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ herf }\SpecialCharTok{+}\NormalTok{ lenper), data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in chol.default(mat, pivot = TRUE, tol = tol): the matrix is either
+## rank-deficient or not positive definite
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{reg}\FloatTok{.72} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(povrate\_w }\SpecialCharTok{\textasciitilde{}}\NormalTok{ lenper }\SpecialCharTok{+}\NormalTok{ pctbk1990}\SpecialCharTok{|}\DecValTok{0}\SpecialCharTok{|}\NormalTok{(dism1990 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ herf }\SpecialCharTok{+}\NormalTok{lenper }\SpecialCharTok{+}\NormalTok{ pctbk1990),data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in chol.default(mat, pivot = TRUE, tol = tol): the matrix is either
+## rank-deficient or not positive definite
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{reg}\FloatTok{.73} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(povrate\_w }\SpecialCharTok{\textasciitilde{}}\NormalTok{ lenper }\SpecialCharTok{+}\NormalTok{ pctbk1990 }\SpecialCharTok{+}\NormalTok{ lfp1920}\SpecialCharTok{|}\DecValTok{0}\SpecialCharTok{|}\NormalTok{(dism1990 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ herf }\SpecialCharTok{+}\NormalTok{lenper }\SpecialCharTok{+}\NormalTok{ pctbk1990 }\SpecialCharTok{+}\NormalTok{lfp1920),data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in chol.default(mat, pivot = TRUE, tol = tol): the matrix is either
+## rank-deficient or not positive definite
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{reg}\FloatTok{.74} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(povrate\_b }\SpecialCharTok{\textasciitilde{}}\NormalTok{ lenper}\SpecialCharTok{|}\DecValTok{0}\SpecialCharTok{|}\NormalTok{(dism1990 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ herf }\SpecialCharTok{+}\NormalTok{ lenper), data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in chol.default(mat, pivot = TRUE, tol = tol): the matrix is either
+## rank-deficient or not positive definite
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{reg}\FloatTok{.75} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(povrate\_b }\SpecialCharTok{\textasciitilde{}}\NormalTok{ lenper }\SpecialCharTok{+}\NormalTok{ pctbk1990}\SpecialCharTok{|}\DecValTok{0}\SpecialCharTok{|}\NormalTok{(dism1990 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ herf }\SpecialCharTok{+}\NormalTok{lenper }\SpecialCharTok{+}\NormalTok{ pctbk1990),data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in chol.default(mat, pivot = TRUE, tol = tol): the matrix is either
+## rank-deficient or not positive definite
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{reg}\FloatTok{.76} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(povrate\_b }\SpecialCharTok{\textasciitilde{}}\NormalTok{ lenper }\SpecialCharTok{+}\NormalTok{ pctbk1990 }\SpecialCharTok{+}\NormalTok{ lfp1920}\SpecialCharTok{|}\DecValTok{0}\SpecialCharTok{|}\NormalTok{(dism1990 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ herf }\SpecialCharTok{+}\NormalTok{lenper }\SpecialCharTok{+}\NormalTok{ pctbk1990 }\SpecialCharTok{+}\NormalTok{lfp1920),data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in chol.default(mat, pivot = TRUE, tol = tol): the matrix is either
+## rank-deficient or not positive definite
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{stargazer}\NormalTok{(reg}\FloatTok{.71}\NormalTok{, reg}\FloatTok{.72}\NormalTok{, reg}\FloatTok{.73}\NormalTok{,reg}\FloatTok{.74}\NormalTok{, reg}\FloatTok{.75}\NormalTok{, reg}\FloatTok{.76}\NormalTok{, }\AttributeTok{header =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{type =} \StringTok{"text"}\NormalTok{, }\AttributeTok{se =} \FunctionTok{list}\NormalTok{(reg}\FloatTok{.71}\SpecialCharTok{$}\NormalTok{rse, reg}\FloatTok{.72}\SpecialCharTok{$}\NormalTok{rse, reg}\FloatTok{.73}\SpecialCharTok{$}\NormalTok{rse,reg}\FloatTok{.74}\SpecialCharTok{$}\NormalTok{rse, reg}\FloatTok{.75}\SpecialCharTok{$}\NormalTok{rse, reg}\FloatTok{.76}\SpecialCharTok{$}\NormalTok{rse))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## =========================================================================================================================
+##                                                              Dependent variable:                                         
+##                     -----------------------------------------------------------------------------------------------------
+##                                         povrate_w                                          povrate_b                     
+##                           (1)              (2)              (3)              (4)              (5)              (6)       
+## -------------------------------------------------------------------------------------------------------------------------
+## lenper                   0.602            -0.479           -0.918           -4.780           -2.331           -1.586     
+##                         (1.970)          (1.801)          (1.550)          (3.067)          (2.402)          (2.655)     
+##                                                                                                                          
+## pctbk1990                                 0.211            0.180                            -0.478*          -0.426*     
+##                                          (0.153)          (0.136)                           (0.246)          (0.230)     
+##                                                                                                                          
+## lfp1920                                                    -0.122                                             0.207      
+##                                                           (0.105)                                            (0.208)     
+##                                                                                                                          
+## `dism1990(fit)`        -0.196***         -0.241**         -0.224**         0.258**          0.360**          0.333**     
+##                         (0.065)          (0.097)          (0.088)          (0.108)          (0.141)          (0.132)     
+##                                                                                                                          
+## Constant                0.205***         0.219***         0.263***         0.121**           0.091            0.016      
+##                         (0.037)          (0.048)          (0.073)          (0.061)          (0.068)          (0.120)     
+##                                                                                                                          
+## -------------------------------------------------------------------------------------------------------------------------
+## Observations              121              121              121              121              121              121       
+## R2                       -0.150           -0.254           -0.172           0.084            0.108            0.130      
+## Adjusted R2              -0.170           -0.286           -0.212           0.068            0.085            0.100      
+## Residual Std. Error 0.037 (df = 118) 0.039 (df = 117) 0.038 (df = 116) 0.077 (df = 118) 0.076 (df = 117) 0.076 (df = 116)
+## =========================================================================================================================
+## Note:                                                                                         *p<0.1; **p<0.05; ***p<0.01
+\end{verbatim}
+
+regression 选最有影响的一个city chara one more control variable, two
+more, three more\ldots{} example of additional control variable :
+percentage of black
+
+\textbf{Answer:} controls do not have a large effect on the results
+
+\clearpage
+
+\hypertarget{why-two-stage-least-squares}{%
+\section{\texorpdfstring{8. Why \textbf{Two Stage} least
+squares?}{8. Why Two Stage least squares?}}\label{why-two-stage-least-squares}}
+
+Because the estimates in this paper only feature one endogenous
+regressor and one instrument, it is an excellent example with which to
+illustrate build intuition and see what the instrumental variables
+regressor is actually doing because in this scenario the IV estimator is
+exactly equal to the two stage least squares estimator
+(\(\hat{\beta}_{IV}=\hat{\beta}_{2SLS}\)).
+
+\hypertarget{question-estimate-the-first-stage-regression-and-use-your-estimates-to-generate-the-predicted-values-for-the-explanatory-variable-for-all-the-observations.}{%
+\subsection{8.1 Question: Estimate the first stage regression and use
+your estimates to generate the predicted values for the explanatory
+variable for all the
+observations.}\label{question-estimate-the-first-stage-regression-and-use-your-estimates-to-generate-the-predicted-values-for-the-explanatory-variable-for-all-the-observations.}}
+
+\textbf{Code:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{first\_stage }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(dism1990 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ herf, }\AttributeTok{data =}\NormalTok{ data)}
+\FunctionTok{stargazer}\NormalTok{(first\_stage, }\AttributeTok{header =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{type =} \StringTok{"text"}\NormalTok{, }\AttributeTok{se =} \FunctionTok{list}\NormalTok{(first\_stage}\SpecialCharTok{$}\NormalTok{rse))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## ===============================================
+##                         Dependent variable:    
+##                     ---------------------------
+##                              dism1990          
+## -----------------------------------------------
+## herf                         0.400***          
+##                               (0.080)          
+##                                                
+## Constant                     0.280***          
+##                               (0.059)          
+##                                                
+## -----------------------------------------------
+## Observations                    121            
+## R2                             0.175           
+## Adjusted R2                    0.168           
+## Residual Std. Error      0.123 (df = 119)      
+## F Statistic           25.190*** (df = 1; 119)  
+## ===============================================
+## Note:               *p<0.1; **p<0.05; ***p<0.01
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data}\SpecialCharTok{$}\NormalTok{predicted\_dism1990 }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(first\_stage)}
+\end{Highlighting}
+\end{Shaded}
+
+\clearpage
+
+\hypertarget{question-if-our-instrument-is-valid-the-step-above-removed-the-bad-endogenous-variation-from-the-predicted-explanatory-variable-keeping-only-the-exogenous-variation-that-is-generated-by-the-instrument.-now-run-the-second-stage-by-regressing-our-outcome-variable-on-the-predicted-values-generated-above-and-the-relevant-controls.-compare-your-estimates-from-this-regression-to-those-generated-earlier.-how-do-they-compare}{%
+\subsection{8.2 Question: If our instrument is valid, the step above
+``removed'' the ``bad'' endogenous variation from the predicted
+explanatory variable, keeping only the exogenous variation that is
+generated by the instrument. Now run the second stage by regressing our
+outcome variable on the predicted values generated above and the
+relevant controls. Compare your estimates from this regression to those
+generated earlier. How do they
+compare?}\label{question-if-our-instrument-is-valid-the-step-above-removed-the-bad-endogenous-variation-from-the-predicted-explanatory-variable-keeping-only-the-exogenous-variation-that-is-generated-by-the-instrument.-now-run-the-second-stage-by-regressing-our-outcome-variable-on-the-predicted-values-generated-above-and-the-relevant-controls.-compare-your-estimates-from-this-regression-to-those-generated-earlier.-how-do-they-compare}}
+
+\textbf{Code:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{model.black.pd }\OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(povrate\_b }\SpecialCharTok{\textasciitilde{}}\NormalTok{ predicted\_dism1990}\SpecialCharTok{+}\NormalTok{lenper, }\AttributeTok{data =}\NormalTok{ data)}
+\NormalTok{model.white.pd }\OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(povrate\_w }\SpecialCharTok{\textasciitilde{}}\NormalTok{ predicted\_dism1990}\SpecialCharTok{+}\NormalTok{lenper, }\AttributeTok{data =}\NormalTok{ data)}
+
+\FunctionTok{stargazer}\NormalTok{(model.black.pd, model.white.pd, }\AttributeTok{header =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{type =} \StringTok{"text"}\NormalTok{, }\AttributeTok{se =} \FunctionTok{list}\NormalTok{(model.black.pd}\SpecialCharTok{$}\NormalTok{rse, model.white.pd}\SpecialCharTok{$}\NormalTok{rse))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## ===========================================================
+##                                    Dependent variable:     
+##                                ----------------------------
+##                                  povrate_b      povrate_w  
+##                                     (1)            (2)     
+## -----------------------------------------------------------
+## predicted_dism1990                 0.231*       -0.175***  
+##                                   (0.120)        (0.054)   
+##                                                            
+## lenper                             0.004        -3.022***  
+##                                   (4.398)        (1.011)   
+##                                                            
+## Constant                           0.133*       0.197***   
+##                                   (0.069)        (0.032)   
+##                                                            
+## -----------------------------------------------------------
+## Observations                        121            121     
+## R2                                 0.027          0.111    
+## Adjusted R2                        0.010          0.096    
+## Residual Std. Error (df = 118)     0.079          0.033    
+## ===========================================================
+## Note:                           *p<0.1; **p<0.05; ***p<0.01
+\end{verbatim}
+
+\textbf{Answer:} pretty similar
+
+\clearpage
+
+\hypertarget{yet-another-iv-trick-taking-the-good-variation-and-scaling-it}{%
+\section{9. Yet another IV trick: Taking the ``Good'' variation and
+scaling
+it}\label{yet-another-iv-trick-taking-the-good-variation-and-scaling-it}}
+
+\hypertarget{question-take-the-coefficient-from-you-reduced-form-estimate-and-divide-it-by-your-first-stage-estimate.-how-does-this-value-compare-your-earlier-estimate-for-the-main-result}{%
+\subsection{9.1 Question: Take the coefficient from you reduced form
+estimate and divide it by your first stage estimate. How does this value
+compare your earlier estimate for the main
+result?}\label{question-take-the-coefficient-from-you-reduced-form-estimate-and-divide-it-by-your-first-stage-estimate.-how-does-this-value-compare-your-earlier-estimate-for-the-main-result}}
+
+\textbf{Answer:}
+
+\hypertarget{submission-instructions}{%
+\section{10. Submission instructions:}\label{submission-instructions}}
+
+\begin{itemize}
+\tightlist
+\item
+  Make sure the final version of your assignment is knit in pdf format
+  and uploaded to gradescope. Make sure you have one question response
+  per page (unless otherwise indicated) so that question positions align
+  with the template in gradescope.The final PDF should be 22 pages long.
+\end{itemize}
+
+\end{document}

@@ -1,0 +1,398 @@
+---
+title: 'Problem Set 3: Instrumental Variables Key'
+author: "Claire Duquennois"
+output:
+  html_document:
+    df_print: paged
+  pdf_document:
+    number_sections: yes
+  word_document: default
+---
+
+```{r setup, include=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+***Name: ***
+Xiang Li
+
+
+# 1. Empirical Analysis using Data from Ananat (2011, AEJ:AE)
+
+
+This exercise uses data from Elizabeth Ananat's paper, "The Wrong Side(s) of the Tracks: The Causal Effects of Racial Segregation on Urban Poverty and Inequality," published in the *American Economic Journal: Applied Economics* in 2011. This paper studies how segregation has affected population characteristics and income disparity in US cities using the layout of railroad tracks as an instrumental variable. 
+
+
+# 2. Finding the data
+
+The data can be found by following the link on the AEJ: Applied Economics' website which will take you to the ICPSR's data repository. You will need to sign in to get access to the data files. Once logged in, you will find the set of files that are typically included in a replication file. These include several datasets, several .do files (which is a STATA command file). For this assignment we will be using the`aej_maindata.dta` file.
+
+ \clearpage
+
+
+# 3. Set up and opening the data
+
+## 3.1 Question: Load any packages you will need and the data contained in the `aej_maindata.dta` file. How many observations are contained in the data. What is the level of an observation? 
+
+**Code and Answer:**
+```{r}
+library("haven")
+library("dplyr")
+library("stargazer")
+library("lfe")
+```
+```{r}
+maindata <- read_dta("aej_maindata.dta")
+nrow(maindata)
+```
+Answer: There are 121 observations are contained in the data, it's a city level of an observation.
+
+
+ \clearpage
+ 
+# 4. Data Description
+
+## 4.1 Question:The dataset contains many variables, some of which are not used in this exercise. Keep the following variables in the final dataset (Hint: use the `select` function in `dplyr`). 
+
+| Name     |Description                                                             |
+|----------|------------------------------------------------------------------------|
+|dism1990	 |1990 dissimilarity index                                                | 
+|herf      |RDI (Railroad division index)                                           |
+|lenper    |Track length per square km                                              |
+|povrate_w |White poverty rate 1990                                                 |
+|povrate_b |Black poverty rate 1990                                                 |
+|area1910  |Physical area in 1910 (1000 sq. miles)                                  |
+|count1910 |Population in 1910 (1000s)                                              | 
+|ethseg10  |Ethnic Dissimilariy index in 1910                                       |
+|ethiso10  |Ethnic isolation index in 1910                                          |
+|black1910 |Percent Black in 1910                                                   |
+|passpc    |Street cars per capita 1915                                             |
+|black1920 |Percent Black 1920                                                      |
+|lfp1920   |Labor Force Participation 1920                                          |
+|incseg    |Income segregation 1990                                                 |
+|pctbk1990 |Percent Black 1990                                                      |
+|manshr    |Share employed in manufacturing 1990                                    |
+|pop1990   |Population in 1990                                                      |
+
+**You can find the detailed description of each variable in the original paper. **
+
+**Code:**
+```{r}
+dataselect <- select(maindata, dism1990, herf, lenper, povrate_w, povrate_b, area1910, count1910, ethseg10, ethiso10, black1910, passpc, black1920, lfp1920, incseg, pctbk1990, manshr, pop1990)
+```
+
+
+
+ \clearpage
+
+# 5. Summary Statistics: 
+
+## 5.1 Question: Report summary statistics of the following variables in the dataset:"dism1990", "herf", "lenper", "povrate_w", "povrate_b". Present these summary statistics in a formatted table, you can use `stargazer` or other packages.
+
+**Code:**
+```{r}
+data <- as.data.frame(dataselect)
+selected_vars <- c("dism1990", "herf", "lenper", "povrate_w", "povrate_b")
+stargazer(data[, selected_vars], type = "text", digits=3, title = "Summary Statistics")
+```
+
+
+ \clearpage
+
+# 6. Reduced Form:
+
+## 6.1 Question: We are interested in understanding how segregation affects population characteristics and income disparity in US cities. We will focus on two outcome variables: the poverty rate for blacks and whites. Regress these two outcome variables on segregation in 1990, our explanatory variable, and interpret your results. Report robust standard errors. Make sure you specify the units of measurement in your interpretation. 
+
+**Code:**
+```{r}
+#install.packages("lmtest", "sandwich")
+library(lmtest)
+library(sandwich)
+```
+
+```{r}
+#Regress the two outcome variables on segregation in 1990
+
+model.black <- lm(povrate_b ~ dism1990, data = data)
+model.white <- lm(povrate_w ~ dism1990, data = data)
+
+stargazer(model.black, model.white, header = FALSE, type = "text", se = list(model.black$rse, model.white$rse), title = "Effect of Poverty Rate for Blacks and Whites on Segregation")
+```
+```{r}
+# Report robust standard errors
+
+robust_black <- coeftest(model.black, vcov = vcovHC)
+robust_white <- coeftest(model.white, vcov = vcovHC)
+
+stargazer(robust_black, robust_white, header = FALSE, type = "text", title = "Robust Standard Errors")
+```
+
+**Answer:**
+The segregation in 1990 and the poverty rate for blacks is positive related, which means with 1 unit increasing of segregation, the poverty rate for blacks is expected to increase by 0.182 percentage points.
+The segregation in 1990 and the poverty rate for whites is negative related, which means with 1 unit increasing of segregation, the poverty rate for whites is expected to decrease by 0.073 percentage points.
+
+ \clearpage
+
+
+## 6.2 Question: Explain the problem with giving a causal interpretation to the estimates you just produced. Give examples of specific factors that might make a causal interpretation of your result problematic.
+
+**Answer:**
+There might be other variables that we don't observe, such as public policy or schooling years, that affect the poverty rate, also high poverty rate could lead to increasing of segregation.
+
+ \clearpage
+
+# 7. Validity of the instrument:
+
+## 7.1 Question: Estimate the following regression and interpret it's coefficients, 
+$$
+ dism1990_i=\beta_0+\beta_1RDI_i+\beta_2 tracklength_i+\epsilon.
+$$
+
+**Code:**
+```{r}
+reg.dism <- felm(dism1990 ~ herf + lenper, data)
+stargazer(reg.dism, header = FALSE, type = "text", title = "Effect of RDI and Tracklength on Segregation")
+```
+
+
+**Answer:**
+B_1 = 0.357: This indicates the estimated change in dism1990 for a one-unit increase in RDI, holding other variables constant, which means with 1 unit increasing of RDI, the dism1990 is expected to increase by 0.357 percentage points.
+
+B_2 = 18.514: This indicates the estimated change in dism1990 for a one-unit increase in tracklength, holding other variables constant, which means with 1 unit increasing of tracklength, the dism1990 is expected to increase by 18.514 percentage points.
+
+ \clearpage
+
+## 7.2 Question: Re-estimate the specification above using the `scale()` command around the variables you wish to standardize in the regression. What do you notice?
+
+**Code:**
+```{r}
+## Standardize the tracklength in the regression
+reg.sd <- felm(dism1990 ~ herf + scale(lenper), data) 
+stargazer(reg.sd, header = FALSE, type = "text", title = "Re-estimate")
+```
+
+
+**Answer:**
+The coefficient of tracklength decreased from 18.524 to 0.023, which looks more similar to the coefficient of RDI, this can help us to see the influence easier.
+
+
+ \clearpage
+
+
+## 7.3 Question: In the context of instrumental variables, what is this regression referred to as and why is it important? 
+
+**Answer:**
+This referred to first stage, it is important because it can show explanatory power explain in some way to segregation, RDI to be a good instrument.
+
+\clearpage
+
+## 7.4 Question: Illustrate the relationship between the RDI and segregation graphically. 
+
+**Code:**
+```{r}
+library(ggplot2)
+plotted <- ggplot(data = data, aes(x = herf, y = dism1990, color = variable)) +
+  geom_point(aes(y = dism1990,col = "dism1990"), color = "#00bdcd", alpha = 0.4, shape = 18, size = 3) +
+  geom_smooth(method = "lm", aes(y = dism1990, col = "dism1990"), color = "#006b7b", fill = "#88c4e8") +
+  theme_minimal() +
+  labs(title = "The Relationship Between the RDI and Segregation" , face = "bold", x = "RDI", y = "dism1990", color = "Regressand Variable")
+ 
+plotted
+```
+
+
+ \clearpage
+
+## 7.5 Question: Is there a concern that this might be a weak instrument? Why would this be a problem?
+
+**Answer:**
+```{r}
+summary(reg.sd)
+```
+We can see the F-statistic is 14.98 from above, which is larger than 10. This means that it is not a weak instrument.
+
+ \clearpage
+
+
+## 7.6 Question: Select a number of relevant city characteristics in the data to regress on the RDI and track length. Present your results and interpret your findings. Why do these results matter for answering our question of interest? 
+
+**Code and Answer:**
+```{r}
+reg.1 <- felm(area1910 ~ herf + lenper, data)
+reg.2 <- felm(count1910 ~ herf + lenper, data)
+reg.3 <- felm(black1910 ~ herf + lenper, data)
+reg.4 <- felm(ethseg10 ~ herf + lenper, data)
+reg.5 <- felm(ethiso10 ~ herf + lenper, data)
+
+
+stargazer(reg.1, reg.2, reg.3, reg.4, reg.5, header = FALSE, type = "text", 
+          title = "Impact of City Characteristics on RDI", 
+          se = list(reg.1$rse, reg.2$rse, reg.4$rse, reg.5$rse))
+```
+
+All of the coefficients of variables are not significant, which means that the exclusion restriction holds.
+
+ \clearpage
+
+
+## 7.7 Question: What are the two conditions necessary for a valid instrument? What evidence do you have that the RDI meet these conditions? Be specific in supporting this claim. 
+
+**Answer:**
+Cov(z, x_1) != 0 (the first stage)
+Cov(z, v) = 0 (the exclusion restriction)
+y:poverty rate
+x_1: dism1990(segregation)
+z: herf(RDI)
+v: city characteristics
+
+The first stage quite strong, very significant, which means RDI it related with segregation, while not related to other characteristic, which means the exclusion restriction holds.
+
+
+ \clearpage
+
+## 7.8 Question: Do you believe the instrument is valid? Why/why not?
+
+**Answer:**
+Maybe, however, if there are something elso can influence the poverty rate, such as the price of train or the places accesible by railwae, this might be not valid.
+
+ \clearpage
+
+## 7.9 Question: Generate a table that estimates the effect of segregation on the poverty rate for blacks and whites by OLS and then using the RDI instrument. Make sure you report robust standard errors. How does the use of the RDI instrument change the estimated coefficients? 
+
+**Code and Answer:**
+```{r}
+model.black.ols <- felm(povrate_b ~ dism1990, data = data)
+model.white.ols <- felm(povrate_w ~ dism1990, data = data)
+
+model.black.RDI <- felm(povrate_b ~ lenper|0|(dism1990 ~ herf), data = data)
+model.white.RDI <- felm(povrate_w ~ lenper|0|(dism1990 ~ herf), data = data)
+
+stargazer(model.black.ols, model.white.ols, model.black.RDI, model.white.RDI, 
+          header = FALSE, type = "text", 
+          title = "Effect of Segregation on the Poverty Rate for Blacks and Whites (OLS and IV)",
+          se = list(model.black.ols$rse, model.white.ols$rse,model.black.RDI$rse, model.white.RDI$rse))
+```
+The use of RDI instrument can remove the bias and address endogeneity concerns.
+
+
+ \clearpage
+
+## 7.10 Question: What is the reduced form equation?
+
+**Answer:**
+$$
+povrateblack_i = \pi_0 + \pi_1 \times herf_i + \eta\\
+povratewhite_i = \gamma_0 + \gamma_1 \times herf_i + \eta
+$$
+
+
+
+ \clearpage
+
+## 7.11 Question: (2 pages) For the two poverty rates, estimate the reduced form on all the cities and illustrate the reduced form relationships graphically.
+
+**Code:**
+```{r}
+model.black.rf <- felm(povrate_b ~ herf, data = data)
+model.white.rf <- felm(povrate_w ~ herf, data = data)
+
+stargazer(model.black.rf, model.white.rf, header = FALSE, type = "text", se = list(model.black.rf$rse, model.white.rf$rse), title = "Reduced Form")
+
+```
+
+```{r}
+plotted_po <- ggplot(data = data, aes(x = herf, y = value, color = variable)) +
+  geom_point(aes(y = povrate_w, col = "povrate_w"), color = "#ffbc14", alpha = 0.4, shape = 18, size = 3) +
+  geom_point(aes(y = povrate_b, col = "povrate_b"), color = "#00bdcd", alpha = 0.4, shape = 18, size = 3) +
+  geom_smooth(method = "lm", aes(y = povrate_w, col = "povrate_w"), color = "#f88421", fill = "#f88421", size = 1.3) +
+  geom_smooth(method = "lm", aes(y = povrate_b, col = "povrate_b"), color = "#006b7b", fill = "#006b7b", size = 1.3) +
+  theme_minimal() +
+  labs(title = "The Reduced Form Relationships", face = "bold",
+       x = "RDI", 
+       y = "Poverty Rate", 
+       color = "Regressand Variable") +
+  guides(color = guide_legend(title = "Regressand Variable"))
+  
+ 
+plotted_po
+##Sorry, I have tried many methods to display the legend, but none of them have been successful.
+```
+
+
+
+ \clearpage
+
+## 7.12 Question: Generate a table with at least six estimations that checks whether the main results are robust to adding additional controls for city characteristics. What do you conclude?
+
+**Code:**
+```{r}
+reg.71 <- felm(povrate_w ~ lenper|0|(dism1990 ~ herf + lenper), data)
+reg.72 <- felm(povrate_w ~ lenper + pctbk1990|0|(dism1990 ~ herf +lenper + pctbk1990),data)
+reg.73 <- felm(povrate_w ~ lenper + pctbk1990 + lfp1920|0|(dism1990 ~ herf +lenper + pctbk1990 +lfp1920),data)
+
+reg.74 <- felm(povrate_b ~ lenper|0|(dism1990 ~ herf + lenper), data)
+reg.75 <- felm(povrate_b ~ lenper + pctbk1990|0|(dism1990 ~ herf +lenper + pctbk1990),data)
+reg.76 <- felm(povrate_b ~ lenper + pctbk1990 + lfp1920|0|(dism1990 ~ herf +lenper + pctbk1990 +lfp1920),data)
+
+
+stargazer(reg.71, reg.72, reg.73,reg.74, reg.75, reg.76, header = FALSE, type = "text", se = list(reg.71$rse, reg.72$rse, reg.73$rse,reg.74$rse, reg.75$rse, reg.76$rse))
+```
+
+**Answer:**
+Controls do not have a large effect on the results
+
+ \clearpage
+
+
+# 8. Why **Two Stage** least squares? 
+
+Because the estimates in this paper only feature one endogenous regressor and one instrument, it is an excellent example with which to illustrate build intuition and see what the instrumental variables regressor is actually doing because in this scenario the IV estimator is exactly equal to the two stage least squares estimator ($\hat{\beta}_{IV}=\hat{\beta}_{2SLS}$).
+
+
+## 8.1 Question: Estimate the first stage regression and use your estimates to generate the predicted values for the explanatory variable for all the observations.                                                                                                                                              
+
+**Code:**
+```{r}
+first_stage <- lm(dism1990 ~ herf + lenper, data = data)
+stargazer(first_stage, header = FALSE, type = "text", se = list(first_stage$rse))
+
+data$predicted_dism1990 <- predict(first_stage)
+```
+
+ \clearpage
+
+## 8.2 Question: If our instrument is valid, the step above "removed" the "bad" endogenous variation from the predicted explanatory variable, keeping only the exogenous variation that is generated by the instrument. Now run the second stage by regressing our outcome variable on the predicted values generated above and the relevant controls. Compare your estimates from this regression to those generated earlier. How do they compare?
+
+**Code:**
+```{r}
+#model.black.RDI <- felm(povrate_b ~ lenper|0|(dism1990 ~ herf), data = data)
+#model.white.RDI <- felm(povrate_w ~ lenper|0|(dism1990 ~ herf), data = data)
+model.black.pd <- felm(povrate_b ~ predicted_dism1990 + lenper, data = data)
+model.white.pd <- felm(povrate_w ~ predicted_dism1990 + lenper, data = data)
+
+stargazer(model.black.pd, model.white.pd, header = FALSE, type = "text", se = list(model.black.pd$rse, model.white.pd$rse))
+```
+
+
+**Answer:**
+They are pretty similar.
+
+ \clearpage
+
+# 9. Yet another IV trick: Taking the "Good" variation and scaling it
+
+## 9.1 Question: Take the coefficient from you reduced form estimate and divide it by your first stage estimate. How does this value compare your earlier estimate for the main result? 
+
+**Answer:**
+Reduced form for blacks : 0.092
+Reduced form for whites : -0.077
+Divided by first stage: 0.357
+
+We get 0.258 for blacks and -0.196 for whites, which is the same with what we got in 7.9 and 8.2.
+
+
+# 10. Submission instructions:
+
+- Make sure the final version of your assignment is knit in pdf format and uploaded to gradescope. Make sure you have one question response per page (unless otherwise indicated) so that question positions align with the template in gradescope.The final PDF should be 22 pages long. 
+
+
+

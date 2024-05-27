@@ -1,0 +1,408 @@
+---
+title: 'Problem Set 5: Difference-in-Differences'
+author: "Claire Duquennois"
+output:
+   pdf_document:
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+**Group Member 1:**
+
+**Group Member 2:**
+
+**Group Member 3:**
+
+
+# Empirical Analysis from Lucas Davis' (2004, American Economic Review)
+
+
+This exercise uses data from Lucas Davis' paper, "The Effect of Health Risk on Housing Values: Evidence from a Cancer Cluster," published in the *American Economic Review* in 2004. This paper studies the effects of the emergence of a child cancer cluster on housing prices to estimate the willingness to pay to avoid this environmental health risk. 
+\clearpage
+
+# Set Up
+
+
+## Loading the Packages
+
+Load any R packages you will be using:
+
+**Code:**
+
+\clearpage
+
+## Finding the data
+
+The data can be found by following the link on the AER's website which will take you to the ICPSR's data repository. For this assignment we will be using the `cc.dta`, `cc2.dta`, `lc.dta`, `lc2.dta` and `price.dta` which can be found online. In addition you will want to download the `allpriceindex.dta` file from the course canvas page.
+
+
+
+## Cleaning and constructing the data
+
+Thus far in the course the datasets we have been working with were already assembled and cleaned. When doing econometric analysis from scratch, finding, cleaning and compiling the datasets constitutes much of the work. For this project we will do a little bit more of this prior to analysis since the replication files are much more "raw" then for the other papers we have replicated. 
+
+### **Question: Open the `cc.dta` file. This file contains home sales records for Churchill County. You will need to rename and keep only the following variables:** 
+
+|Old  Name |New Name      |Description                                       |
+|----------|--------------|--------------------------------------------------|
+|var1      |parcel        |Parcel identification number                      |
+|var3      |date          |Sale date                                         |
+|var10     |usecode       |Land use code                                     |
+|var16     |sales         |Sale price                                        |
+|var17     |acres         |Acres                                             |
+|var19     |sqft          |Square Footage                                    |
+|var20     |constryr      |Year constructed                                  |
+|var23     |class         |                                                  |
+
+**Code:**
+
+
+
+\clearpage
+
+### **Question: Next we want to limit our observations to observations where the sales date is reported and that are in the time period we are interested in (date<=20001300) and the type of property we are interested in, which will have a usecode of 20.**
+
+**Code:**
+
+
+\clearpage
+
+### **Question: Finally we need to generated two new variables: a Churchill county indicator, `cc`, and a Lyon County indicator, `lc'.   Set `cc` equal to 1 for all observations and `lc` which will equal 0 for all observations.** 
+
+**Code:**
+
+\clearpage
+
+
+### **Question: Next open the `cc2.dta` file. We need to make this set of sales records compatible with the set of sales records we just cleaned. The way the variables are coded in this data however are different so we need to rename the relevant columns so that the names match up.  **
+
+|Old  Name  |New Name      |Description                                       |
+|-----------|--------------|--------------------------------------------------|
+|parcel__   |parcel        |        (same as above)                           |
+|sale_date  |date          |                                                  |
+|land_use   |usecode       |                                                  |
+|sales_price|sales         |                                                  |
+|acreage    |acres         |                                                  |
+|sq_ft      |sqft          |                                                  |
+|yr_blt     |constryr      |                                                  |
+|class      |class         |                                                  |
+
+**Code:**
+
+
+\clearpage
+
+### **Question: Here too we need to generated two new variables: `cc` which will be equal to 1 for all observations and `lc` which will equal 0 for all observations.** 
+
+**Code:**
+
+\clearpage
+
+### **Question: Compare the formatting of the date variable in the two datasets you are working with. What do you notice? How is the date formatted in the first dataset you loaded and how is it formatted in the second?**
+
+**Answer:**
+
+\clearpage
+
+### **Question: Convert the dates reported in the second dataset to the format used in the first (YYYYMMDD).**
+
+**Code:**
+
+\clearpage
+
+### **Question: For this dataset we limit our observations to observations where (date>=20001300) and observations where the sales date is reported.**
+
+**Code:**
+
+
+\clearpage
+
+### **Question: Keep the same variables as in the first data set and merge the two data sets so that the observations from second datasets are added as new rows to the first dataset. **
+
+**Code:**
+
+
+\clearpage
+
+### **Question: Next open the `lc.dta` file which has sales data for Lyons county. We need to make this set of sales records compatible as well. Rename the variables as follows.  **
+
+|Old  Name  |New Name      |Description                                       |
+|-----------|--------------|--------------------------------------------------|
+|var1       |parcel        |        (same as above)                           |
+|var2       |date          |                                                  |
+|var3       |usecode       |                                                  |
+|var4       |sales         |                                                  |
+|var5       |acres         |                                                  |
+|var6       |sqft          |                                                  |
+|var7       |constryr      |                                                  |
+|var11      |class         |                                                  |
+
+**Code:**
+                                      
+   
+
+\clearpage
+
+### **Question: Here too we need to generated two new variables but this time set `cc` equal to 0 for all observations and `lc`  equal 1 for all observations.** 
+
+**Code:**
+
+\clearpage
+
+### **Question: Keep observations where the sales date is reported and that are in the time period we are interested in (date<=20001300) and the type of property we are interested in, which will have a usecode of 20.**
+
+**Code:**
+
+
+\clearpage
+
+### **Question: Check that everything is compatible and add these observations to your dataset. **
+
+**Code:**
+
+
+\clearpage
+
+### **Question:Repeat these steps with `lc2.dta' where**
+
+|Old  Name  |New Name      |Description                                       |
+|-----------|--------------|--------------------------------------------------|
+|var1       |parcel        |        (same as above)                           |
+|var2       |date          |                                                  |
+|var3       |sales         |                                                  |
+|var4       |acres         |                                                  |
+|var5       |sqft          |                                                  |
+|var6       |constryr      |                                                  |
+|var8       |class         |                                                  |
+
+**Code:**
+                                      
+              
+\clearpage
+
+### **Question: Generate three new variables: `cc` equal to 0 for all observations; `lc`  equal 1 for all observations and `usecode` equal to 20 for all observations.** 
+
+**Code:**
+
+
+\clearpage
+
+### **Question: Keep observations where the sales date is reported and that are in the time period we are interested in (date>20001300). Check that everything is compatible and add these observations to our dataset.**
+
+**Code:**
+
+
+\clearpage
+
+### **Question: Now that we have merged the four files of sales data, we need to create some additional variables and do some further data cleaning. Generate the following seven variables:**
+- A variable with the sales year
+
+- A variable with the sales month
+
+- A variable with the sales day
+
+- A variable for the age of the home
+
+- A variable of the age of the home squared
+
+- A variable of the property acreage squared
+
+- The log nominal sales price.
+
+- The quarter (1-4) within the year
+
+
+**Code:**
+
+
+\clearpage
+
+### **Question: We now want to check that all the observations in the data make sense and are not extreme outliers and re-code any variables with inexplicable values.**
+
+**Drop the following observations:**
+- If the sale price was 0.
+
+- If the home is older then 150
+
+- If the square footage is 0.
+
+- If the square footage is greater than 10000.
+
+- If if date is after Sept. 2002 since that is when the data was collected.
+
+- If the month is 0. 
+
+**Re-code the following observations:**
+
+- If the age of the home is negative, replace with 0.
+
+- If the day is 32 replace with 31.
+
+**We also want to make sure there are no duplicate sales records in the data. Drop the duplicate of any observation that shares the same parcel number and sales date, or that shares the same sales price, date, cc, and acres. **
+
+**Code:**
+
+\clearpage
+
+### **Question: Modify the class variable so that it is discreet: round the value up to the nearest 0.5 increment between 0 and 4.5. Set any values greater than 5 to 0.  **
+
+**Code:**
+
+\clearpage
+
+### **Question: Lyons and Churchill counties could be using the same parcel numbers for different parcels in each county (ie they may each have a parcel identified as 205 within their separate systems). Modify the parcel variable so parcel numbers are uniquely identified. **
+
+**Code:**
+
+\clearpage
+
+
+### **Question: Create a identifying variable that identifies (ie will be the same for) all home sales that occurred within a particular month in a specific county.   **
+
+**Code:**
+
+
+\clearpage
+
+### **Question: We want to adjust the sales price using the Nevada Home Price Index (`nvhpi`) which is available for each quarter in the `price.dta` file. Merge the index into your dataset and calculate the index adjusted real sales price ($\frac{salesprice*100}{nvhpi}$) as well as the log of this real sales price. What is the base year and quarter of this index?**
+
+**Code:**
+
+
+**Answer:**
+
+\clearpage
+
+### **Question: In the paper, Davis maps the cumulative number of leukemia cases that occur in Churchill county in figure 1. For simplicity, we assume a binary treatment: the cancer cluster did not affect outcomes prior to 2000 and did after. Generate a "Post" indicator for years after 1999.**
+
+**Code:**
+
+
+\clearpage
+
+# Summary Statistics: 
+
+## **Question: Create a table comparing baseline characteristics between Lyon and Churchill prior to 2000. To do this, USE LOOPING to run several models where a characteristic of interest is regressed on the Churchill county indicator. Store each regression model and report the results. what do they tell you and why they are important?**
+
+
+
+**Answer:**
+
+\clearpage
+
+# Analysis: 
+
+## **Question: Specify and then estimate the standard difference-in-differences estimator to look at how home sales prices changed between Churchill and Lyons county after the emergence of the cancer cluster. Estimate your specification on the log of real home sales and the sales price.  **
+
+**Answer:**
+
+**Code:**
+
+
+\clearpage
+
+## **Question: Which table in the paper reports equivalent results?**
+
+**Answer:**
+
+\clearpage
+
+## **Question: Interpret each of the coefficients you estimated in the regression using the log real sales.**
+
+**Answer:**
+
+\clearpage
+
+## **Question: Use the estimated coefficients for the effect on the sales price to report the estimated sales price in each of the situations below. Show your calculations.**
+
+|           |Lyon County                     |Churchill County                            |
+|-----------|--------------------------------|--------------------------------------------|
+|Year<=1999 |                                |                                            |
+|Year>1999  |                                |                                            | 
+
+**Answer:**
+
+
+\clearpage
+
+## **Question: What assumption must hold for us to be able to attribute the estimated effect as the causal effect of the cancer cluster? Do you find the evidence convincing in this case?**
+
+**Answer:**
+ 
+\clearpage
+
+
+## **Question: (2 pages) Estimate three new regressions by adjusting your main difference-in-difference specification with logrealsales as the outcome by adding the same controls and fixed effects as those used by Davis in table 3. Cluster your standard errors as he does. How do your estimates compare to his? What is the main difference between this approach and the one that he uses?**
+
+**Code:**
+
+
+
+**Answer:**
+  
+\clearpage
+
+
+## **Question: We would like to check for parallel trends in the pre-period. Using only the data prior to the emergence of the cancer cluster (1990-1998), create an indicator set to 1 for 1990-1994 and set to 0 for 1995-1998. Use your basic specification to test for parallel trends and discuss your results. **
+
+**Code:**
+
+
+
+
+**Answer:**
+
+\clearpage
+
+
+## **Question: (2 pages) In order to better asses how home prices in Churchill and Lyon counties compare to each other over time, calculate the average price of sold homes in each county for each 6 month period. of the data. Plot the evolution of this average for the two counties on the same graph. Include bars to indicate the confidence interval of the calculated means. **
+
+Hint: You want a plot that looks something like the third set of graphs on the following page: http://www.sthda.com/english/wiki/ggplot2-error-bars-quick-start-guide-r-software-and-data-visualization
+
+**Code:**
+
+\clearpage
+
+## **Question: What patterns are we looking for in the two graphs you just produced?**
+
+**Answer:** 
+ 
+
+\clearpage
+
+
+**Davis generates a graph similar to the one you just produces but he uses a calculated housing price index for both Lyon and Churchill counties which he combines with the Nevada price index. We will not replicate all these calculations here. I have already replicated the calculations and compiled this data for you. You can find them on the course canvas page. Download the `allpriceindex.dta` file and keep the following variables:**  
+
+
+|Name                    |Description                                       |
+|------------------------|--------------------------------------------------|
+|dateh                   |Year and semester                                 |
+|indexcc                 |Housing price index in Churchill county           |
+|indexlc                 |Housing price index in Lyon county                |
+|indexnv                 |Housing price index in Nevada                     |
+|vcc1                    |Upper confidence interval for indexcc             |
+|vcc2                    |Lower confidence interval for indexcc             |
+
+
+## **Question: (2 pages) Replicate figures 2 from the paper. Make your figure as visually appealing and informative as possible. **
+
+**Code:**
+
+
+\clearpage
+
+## **Question: Calculate the percentage difference in HPI between Churchill county and the state of Nevada. Replicate figures 3 from the paper. Make your figure as visually appealing and informative as possible.** 
+
+**Code:**
+
+
+
+# Submission instructions:
+
+- Since this is a group assignment only one member of the group will upload it to gradescope. 
+
+- Make sure the final version of your assignment is knit in pdf format and uploaded to gradescope. Make sure you have one question response per page (unless otherwise indicated) so that question positions align with the template in gradescope.The final PDF should be 40 pages long. 
+
+

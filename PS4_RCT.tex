@@ -1,0 +1,956 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Problem Set 4: Randomized Control Trials},
+  pdfauthor={Claire Duquennois},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Problem Set 4: Randomized Control Trials}
+\author{Claire Duquennois}
+\date{}
+
+\begin{document}
+\maketitle
+
+\textbf{Name:} Xiang Li
+
+Instructions:
+
+\begin{itemize}
+\tightlist
+\item
+  This assignment is an individual assignment. You may discuss your
+  responses in small groups or reach out to a classmate if you are
+  having difficulties with coding but your code and answers must reflect
+  your individual efforts and be written using your own words. Identical
+  assignments will be given a zero grade.
+\end{itemize}
+
+\hypertarget{empirical-analysis-using-data-from-bryan-g.-chowdury-s.-mobarak-a.-m.-2014-econometrica}{%
+\section{1. Empirical Analysis using Data from Bryan, G., Chowdury, S.,
+Mobarak, A. M. (2014,
+Econometrica)}\label{empirical-analysis-using-data-from-bryan-g.-chowdury-s.-mobarak-a.-m.-2014-econometrica}}
+
+This exercise uses data from Bryan,Chowdhury, and Mobarak's paper,
+``Underinvestment in a Profitable Technology: the Case of Seasonal
+Migration in Bangladesh,'' published in \emph{Econometrica} in 2014.
+This paper studies the effects of seasonal migration on household
+consumption during the lean season in rural Bangladesh by randomly
+subsidizing the cost of seasonal migration.
+
+\hypertarget{set-up}{%
+\section{2. Set Up:}\label{set-up}}
+
+\hypertarget{finding-the-data}{%
+\subsection{2.1 Finding the data}\label{finding-the-data}}
+
+The data can be found by going to Mushfiq Mobarak's Yale faculty page,
+select ``data'', and then following the link to the data repository page
+on the Harvard dataverse. You will need to sign in to get access to the
+data files. Once logged in, you will find many possible files to
+download. Navigate to the second page of listed files and download
+\texttt{Mobarak\ -\ Monga\ Dataverse\ files.zip} which contains all the
+files we need.
+
+\clearpage
+
+\hypertarget{question-loading-the-data---load-any-packages-you-will-need-and-the-data-contained-in-the-following-files-round1_controls_table1.dta-and-round2.dta.-how-many-observations-are-contained-in-each-of-these-datasets.-what-is-the-level-of-an-observation-explain-any-discrepancies-between-the-datasets.}{%
+\subsection{\texorpdfstring{2.2 Question: Loading the data - Load any
+packages you will need and the data contained in the following files
+\texttt{Round1\_Controls\_Table1.dta} and \texttt{Round2.dta}. How many
+observations are contained in each of these datasets. What is the level
+of an observation? Explain any discrepancies between the
+datasets.**}{2.2 Question: Loading the data - Load any packages you will need and the data contained in the following files Round1\_Controls\_Table1.dta and Round2.dta. How many observations are contained in each of these datasets. What is the level of an observation? Explain any discrepancies between the datasets.**}}\label{question-loading-the-data---load-any-packages-you-will-need-and-the-data-contained-in-the-following-files-round1_controls_table1.dta-and-round2.dta.-how-many-observations-are-contained-in-each-of-these-datasets.-what-is-the-level-of-an-observation-explain-any-discrepancies-between-the-datasets.}}
+
+\textbf{Code and Answer:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(}\StringTok{"haven"}\NormalTok{)}
+\FunctionTok{library}\NormalTok{(}\StringTok{"dplyr"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## 载入程辑包：'dplyr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(}\StringTok{"stargazer"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Please cite as:
+\end{verbatim}
+
+\begin{verbatim}
+##  Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+\end{verbatim}
+
+\begin{verbatim}
+##  R package version 5.2.3. https://CRAN.R-project.org/package=stargazer
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(}\StringTok{"lfe"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 载入需要的程辑包：Matrix
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: 程辑包'Matrix'是用R版本4.3.2 来建造的
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{round1 }\OtherTok{\textless{}{-}} \FunctionTok{read\_dta}\NormalTok{(}\StringTok{"Round1\_Controls\_Table1.dta"}\NormalTok{)}
+\NormalTok{round2 }\OtherTok{\textless{}{-}} \FunctionTok{read\_dta}\NormalTok{(}\StringTok{"Round2.dta"}\NormalTok{)}
+
+\FunctionTok{nrow}\NormalTok{(round1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1900
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{nrow}\NormalTok{(round2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1907
+\end{verbatim}
+
+Answer: There are 1900 observations contained in round1 and 1907
+observations contained in round2. It's village/household level of
+observation. People's moving made the difference.
+
+\clearpage
+
+\hypertarget{question-2-pages-data-description--the-dataset-contains-many-variables-some-of-which-are-not-used-in-this-exercise.-keep-the-following-variables-in-the-final-datasets-hint-use-the-select-function-in-dplyr.}{%
+\subsection{\texorpdfstring{2.3 Question: (2 pages) Data Description-
+The dataset contains many variables, some of which are not used in this
+exercise. Keep the following variables in the final datasets (Hint: use
+the \texttt{select} function in
+\texttt{dplyr}).**}{2.3 Question: (2 pages) Data Description- The dataset contains many variables, some of which are not used in this exercise. Keep the following variables in the final datasets (Hint: use the select function in dplyr).**}}\label{question-2-pages-data-description--the-dataset-contains-many-variables-some-of-which-are-not-used-in-this-exercise.-keep-the-following-variables-in-the-final-datasets-hint-use-the-select-function-in-dplyr.}}
+
+For Round 1 data:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1910}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8090}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Name
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+cash & In cash treatment group \\
+credit & In credit treatment group \\
+info & In information treatment group \\
+control & In control group \\
+q9pdcalq9 & Total calories per person per day \\
+exp\_total\_pc\_r1 & Total monthly household expenditures per capita \\
+hhmembers\_r1 & Number of household members \\
+tsaving\_hh\_r1 & Total household savings \\
+hhh\_education & Household head is educated \\
+num\_adltmalesr1 & Number of adult males in the household \\
+\end{longtable}
+
+For Round 2 data:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1724}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8276}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Name
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+cash & In cash treatment group \\
+credit & In credit treatment group \\
+info & In information treatment group \\
+control & In control group \\
+average\_exp2 & Total consumption per person per month in round 2 \\
+lit & Highest reading and writing ability of household \\
+walls\_good & Wall material (income proxy) \\
+monga & Subjective expectations about monga at baseline \\
+dhaka\_remit & Subjective expectations about migration remitances at
+baseline \\
+dhaka\_network & Subjective expectations about social network in city at
+baseline \\
+exp\_total\_pc\_r1 & Total household expenditures per capita at
+baseline \\
+subsistencer1 & Share of food out of total expenditures at baseline \\
+num\_adltmalesr1 & Household adult males at baseline \\
+num\_childrenr1 & Household small children at baseline \\
+avgQ13earned & Average skill score of network \\
+constrainedr1 & Denied or ineligible for credit at baseline \\
+bankedr1 & Has received credit at baseline \\
+upazila & Sub-district name \\
+village & Village name \\
+migrant & Member of household migrates this season \\
+total\_fish & Total monthly household expenditures per capita on fish \\
+migrant\_new & Household has a first time migrant this season \\
+\end{longtable}
+
+\textbf{A description of each variable should appear in the column
+headers of the loaded data. }
+
+\textbf{Code:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{selectround1 }\OtherTok{\textless{}{-}} \FunctionTok{select}\NormalTok{(round1, cash, credit, info, control, q9pdcalq9, exp\_total\_pc\_r1, hhmembers\_r1, tsaving\_hh\_r1, hhh\_education, num\_adltmalesr1)}
+\NormalTok{selectround2 }\OtherTok{\textless{}{-}} \FunctionTok{select}\NormalTok{(round2, cash, credit, info, control, average\_exp2, lit, walls\_good, monga, dhaka\_remit, dhaka\_network, exp\_total\_pc\_r1, subsistencer1, num\_adltmalesr1, num\_childrenr1, avgQ13earned, constrainedr1, bankedr1, upazila, village, migrant, total\_fish, migrant\_new)}
+\end{Highlighting}
+\end{Shaded}
+
+\clearpage
+
+\hypertarget{analysis}{%
+\section{3. Analysis:}\label{analysis}}
+
+\hypertarget{question-regress-all-the-baseline-household-characteristics-still-included-in-the-round-1-data-on-the-following-three-variables-cash_i-credit_i-and-info_i-and-present-your-results-in-a-table.-what-is-the-equivalent-table-in-the-paper}{%
+\subsection{\texorpdfstring{3.1 \textbf{Question: Regress all the
+baseline household characteristics still included in the round 1 data on
+the following three variables: \(cash_i\), \(credit_i\) and \(info_i\),
+and present your results in a table. What is the equivalent table in the
+paper?}}{3.1 Question: Regress all the baseline household characteristics still included in the round 1 data on the following three variables: cash\_i, credit\_i and info\_i, and present your results in a table. What is the equivalent table in the paper?}}\label{question-regress-all-the-baseline-household-characteristics-still-included-in-the-round-1-data-on-the-following-three-variables-cash_i-credit_i-and-info_i-and-present-your-results-in-a-table.-what-is-the-equivalent-table-in-the-paper}}
+
+\textbf{Code:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{colnames}\NormalTok{(selectround1)[}\FunctionTok{colnames}\NormalTok{(selectround1) }\SpecialCharTok{==} \StringTok{"q9pdcalq9"}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{"TotalCalories"}
+\FunctionTok{colnames}\NormalTok{(selectround1)[}\FunctionTok{colnames}\NormalTok{(selectround1) }\SpecialCharTok{==} \StringTok{"exp\_total\_pc\_r1"}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{"TotalMonthlyHouseholdExpenditures"}
+\FunctionTok{colnames}\NormalTok{(selectround1)[}\FunctionTok{colnames}\NormalTok{(selectround1) }\SpecialCharTok{==} \StringTok{"hhmembers\_r1"}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{"HouseholdMembers"}
+\FunctionTok{colnames}\NormalTok{(selectround1)[}\FunctionTok{colnames}\NormalTok{(selectround1) }\SpecialCharTok{==} \StringTok{"tsaving\_hh\_r1"}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{"TotalHouseholdSavings"}
+\FunctionTok{colnames}\NormalTok{(selectround1)[}\FunctionTok{colnames}\NormalTok{(selectround1) }\SpecialCharTok{==} \StringTok{"hhh\_education"}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{"HouseholdHeadIsEducated"}
+\FunctionTok{colnames}\NormalTok{(selectround1)[}\FunctionTok{colnames}\NormalTok{(selectround1) }\SpecialCharTok{==} \StringTok{"num\_adltmalesr1"}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{"AdultMales\_inthehousehold"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rd1}\FloatTok{.1} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(TotalCalories }\SpecialCharTok{\textasciitilde{}}\NormalTok{ cash }\SpecialCharTok{+}\NormalTok{ credit }\SpecialCharTok{+}\NormalTok{ info, selectround1)}
+\NormalTok{rd1}\FloatTok{.2} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(TotalMonthlyHouseholdExpenditures }\SpecialCharTok{\textasciitilde{}}\NormalTok{ cash }\SpecialCharTok{+}\NormalTok{ credit }\SpecialCharTok{+}\NormalTok{ info, selectround1)}
+\NormalTok{rd1}\FloatTok{.3} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(HouseholdMembers }\SpecialCharTok{\textasciitilde{}}\NormalTok{ cash }\SpecialCharTok{+}\NormalTok{ credit }\SpecialCharTok{+}\NormalTok{ info, selectround1)}
+\NormalTok{rd1}\FloatTok{.4} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(TotalHouseholdSavings }\SpecialCharTok{\textasciitilde{}}\NormalTok{ cash }\SpecialCharTok{+}\NormalTok{ credit }\SpecialCharTok{+}\NormalTok{ info, selectround1)}
+\NormalTok{rd1}\FloatTok{.5} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(HouseholdHeadIsEducated }\SpecialCharTok{\textasciitilde{}}\NormalTok{ cash }\SpecialCharTok{+}\NormalTok{ credit }\SpecialCharTok{+}\NormalTok{ info, selectround1)}
+\NormalTok{rd1}\FloatTok{.6} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(AdultMales\_inthehousehold }\SpecialCharTok{\textasciitilde{}}\NormalTok{ cash }\SpecialCharTok{+}\NormalTok{ credit }\SpecialCharTok{+}\NormalTok{ info, selectround1)}
+
+\FunctionTok{stargazer}\NormalTok{(rd1}\FloatTok{.1}\NormalTok{, rd1}\FloatTok{.2}\NormalTok{, rd1}\FloatTok{.3}\NormalTok{, rd1}\FloatTok{.4}\NormalTok{, rd1}\FloatTok{.5}\NormalTok{, rd1}\FloatTok{.6}\NormalTok{, }\AttributeTok{header =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{type =} \StringTok{"text"}\NormalTok{, }\AttributeTok{se =} \FunctionTok{list}\NormalTok{(rd1}\FloatTok{.1}\SpecialCharTok{$}\NormalTok{rse, rd1}\FloatTok{.2}\SpecialCharTok{$}\NormalTok{rse, rd1}\FloatTok{.3}\SpecialCharTok{$}\NormalTok{rse, rd1}\FloatTok{.4}\SpecialCharTok{$}\NormalTok{rse, rd1}\FloatTok{.5}\SpecialCharTok{$}\NormalTok{rse, rd1}\FloatTok{.6}\SpecialCharTok{$}\NormalTok{rse))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## ===================================================================================================================================================================
+##                                                                                   Dependent variable:                                                              
+##                     -----------------------------------------------------------------------------------------------------------------------------------------------
+##                        TotalCalories    TotalMonthlyHouseholdExpenditures HouseholdMembers  TotalHouseholdSavings HouseholdHeadIsEducated AdultMales_inthehousehold
+##                             (1)                        (2)                       (3)                 (4)                    (5)                      (6)           
+## -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## cash                      -18.110                    -12.246                   -0.068              -72.736                -0.0002                   0.011          
+##                          (36.598)                   (40.472)                   (0.092)            (166.509)               (0.030)                  (0.041)         
+##                                                                                                                                                                    
+## credit                    -19.795                     8.954                    -0.009              -51.921                -0.011                    0.039          
+##                          (37.994)                   (54.438)                   (0.091)            (181.413)               (0.031)                  (0.041)         
+##                                                                                                                                                                    
+## info                     -77.994*                    -61.094                    0.056              192.757                -0.035                   -0.004          
+##                          (44.546)                   (41.351)                   (0.113)            (228.368)               (0.034)                  (0.049)         
+##                                                                                                                                                                    
+## Constant               2,099.301***               1,067.080***                3.993***          1,418.291***             0.252***                 1.182***         
+##                          (30.419)                   (34.527)                   (0.076)            (134.901)               (0.025)                  (0.034)         
+##                                                                                                                                                                    
+## -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## Observations               1,893                      1,892                     1,892                997                   1,892                    1,893          
+## R2                         0.002                      0.001                     0.001               0.002                  0.001                    0.001          
+## Adjusted R2               0.0004                     -0.001                    -0.001              -0.001                 -0.001                   -0.001          
+## Residual Std. Error 545.696 (df = 1889)        720.919 (df = 1888)        1.333 (df = 1888) 2,008.575 (df = 993)     0.429 (df = 1888)        0.602 (df = 1889)    
+## ===================================================================================================================================================================
+## Note:                                                                                                                                   *p<0.1; **p<0.05; ***p<0.01
+\end{verbatim}
+
+\textbf{Answer:} the equivalent table in the paper is table 1
+
+\clearpage
+
+\hypertarget{question-how-should-the-coefficients-in-the-table-above-be-interpreted-what-should-we-look-for-in-this-table}{%
+\subsection{\texorpdfstring{3.2 \textbf{Question: How should the
+coefficients in the table above be interpreted? What should we look for
+in this
+table?}}{3.2 Question: How should the coefficients in the table above be interpreted? What should we look for in this table?}}\label{question-how-should-the-coefficients-in-the-table-above-be-interpreted-what-should-we-look-for-in-this-table}}
+
+\textbf{Answer:} We need to check if the coefficients are positive or
+negative. All the baseline household characteristics are negative
+relative with cash. Except TotalMonthlyHouseholdExpenditures, other
+characteristics are negative with credit. Except HouseholdMembers and
+TotalHouseholdSavings, other characteristics are negative with info. And
+they are all not statistics significant, which is exactly what we need.
+The treatment influences the consumption only through migrant by
+randomization.
+
+\clearpage
+
+\hypertarget{question-using-the-round-2-data-regress-migrant-on-the-treatment-arm-indicators.-what-is-the-equivalent-table-in-the-paper}{%
+\subsection{\texorpdfstring{3.3 \textbf{Question: Using the round 2
+data, regress migrant on the treatment arm indicators. What is the
+equivalent table in the
+paper?}}{3.3 Question: Using the round 2 data, regress migrant on the treatment arm indicators. What is the equivalent table in the paper?}}\label{question-using-the-round-2-data-regress-migrant-on-the-treatment-arm-indicators.-what-is-the-equivalent-table-in-the-paper}}
+
+\textbf{Code:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rd2}\FloatTok{.1} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(migrant }\SpecialCharTok{\textasciitilde{}}\NormalTok{ cash }\SpecialCharTok{+}\NormalTok{ credit }\SpecialCharTok{+}\NormalTok{ info, selectround2)}
+\FunctionTok{stargazer}\NormalTok{(rd2}\FloatTok{.1}\NormalTok{, }\AttributeTok{header =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{type =} \StringTok{"text"}\NormalTok{, }\AttributeTok{se =} \FunctionTok{list}\NormalTok{(rd2}\FloatTok{.1}\SpecialCharTok{$}\NormalTok{rse))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## ===============================================
+##                         Dependent variable:    
+##                     ---------------------------
+##                               migrant          
+## -----------------------------------------------
+## cash                         0.230***          
+##                               (0.033)          
+##                                                
+## credit                       0.208***          
+##                               (0.034)          
+##                                                
+## info                          -0.0004          
+##                               (0.039)          
+##                                                
+## Constant                     0.360***          
+##                               (0.028)          
+##                                                
+## -----------------------------------------------
+## Observations                   1,871           
+## R2                             0.043           
+## Adjusted R2                    0.041           
+## Residual Std. Error      0.490 (df = 1867)     
+## ===============================================
+## Note:               *p<0.1; **p<0.05; ***p<0.01
+\end{verbatim}
+
+\textbf{Answer:} the equivalent table in the paper is table 2
+
+\clearpage
+
+\hypertarget{question-how-should-the-coefficients-in-the-table-above-be-interpreted-why-is-this-table-important}{%
+\subsection{\texorpdfstring{3.4 \textbf{Question: How should the
+coefficients in the table above be interpreted? Why is this table
+important?}}{3.4 Question: How should the coefficients in the table above be interpreted? Why is this table important?}}\label{question-how-should-the-coefficients-in-the-table-above-be-interpreted-why-is-this-table-important}}
+
+\textbf{Answer:} Migrant is positive related with cash and credit and
+statistics significant but negative related with info and not statistics
+significant.
+
+\clearpage
+
+\hypertarget{question-what-is-the-underlying-migration-rate-in-the-control-group-and-how-might-this-change-our-interpretation-of-the-results}{%
+\subsection{\texorpdfstring{3.5 \textbf{Question: What is the underlying
+migration rate in the control group and how might this change our
+interpretation of the results?
+}}{3.5 Question: What is the underlying migration rate in the control group and how might this change our interpretation of the results? }}\label{question-what-is-the-underlying-migration-rate-in-the-control-group-and-how-might-this-change-our-interpretation-of-the-results}}
+
+\textbf{Answer:} The underlying migration rate in the control group is
+0.360. By dummy variable, one additional cash predicts migrant
+0.230+0.360 higher, one additional credit predicts 0.208+0.360 higher,
+and one additional info predicts -0.0004+0.360 higher.
+
+\clearpage
+
+\hypertarget{question-2-pages-replicate-the-results-presented-in-the-third-row-of-the-first-three-columns-of-table-3.-present-them-in-a-table-and-interpret-these-results.}{%
+\subsection{\texorpdfstring{3.6 \textbf{Question: (2 pages) Replicate
+the results presented in the third row of the first three columns of
+table 3. Present them in a table and interpret these results.
+}}{3.6 Question: (2 pages) Replicate the results presented in the third row of the first three columns of table 3. Present them in a table and interpret these results. }}\label{question-2-pages-replicate-the-results-presented-in-the-third-row-of-the-first-three-columns-of-table-3.-present-them-in-a-table-and-interpret-these-results.}}
+
+Note 1: The authors elect to drop one household observation because the
+reported value of total fish consumed in the household is very high.
+
+Note 2: To replicate the standard errors in the paper you will need to
+cluster your standard errors at the village level. We will discuss
+clustering later in the semester. Using \texttt{felm} you can specify
+the level of clustering (\texttt{clustervariable}) using the following
+command:
+
+\texttt{reg\textless{}-felm(Y\textasciitilde{}x1\textbar{}fevariables\textbar{}ivfirststage\textbar{}clustervariable,\ dataname)}
+
+where you can replace fevariables and ivfirststage with 0 if you are not
+using fixed effects or an instrument.
+
+\textbf{Code:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rd2 }\OtherTok{\textless{}{-}} \FunctionTok{subset}\NormalTok{(selectround2, total\_fish }\SpecialCharTok{\textless{}} \DecValTok{16359}\NormalTok{)}
+
+\NormalTok{rd2}\FloatTok{.2} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(average\_exp2 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ cash }\SpecialCharTok{+}\NormalTok{ credit }\SpecialCharTok{+}\NormalTok{ info}\SpecialCharTok{|}\NormalTok{upazila}\SpecialCharTok{|}\DecValTok{0}\SpecialCharTok{|}\NormalTok{village, }\AttributeTok{data =}\NormalTok{ rd2)}
+
+\FunctionTok{stargazer}\NormalTok{(rd2}\FloatTok{.2}\NormalTok{, }\AttributeTok{header =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{type =} \StringTok{"text"}\NormalTok{, }\AttributeTok{se =} \FunctionTok{list}\NormalTok{(rd2}\FloatTok{.2}\SpecialCharTok{$}\NormalTok{rse))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## ===============================================
+##                         Dependent variable:    
+##                     ---------------------------
+##                            average_exp2        
+## -----------------------------------------------
+## cash                         96.566***         
+##                              (27.229)          
+##                                                
+## credit                       76.743***         
+##                              (27.995)          
+##                                                
+## info                          38.521           
+##                              (39.657)          
+##                                                
+## -----------------------------------------------
+## Observations                   1,869           
+## R2                             0.044           
+## Adjusted R2                    0.036           
+## Residual Std. Error     452.094 (df = 1852)    
+## ===============================================
+## Note:               *p<0.1; **p<0.05; ***p<0.01
+\end{verbatim}
+
+\textbf{Answer:} Total consumption is positive related with cash, credit
+and info, and it is statistics significant on cash and credit.
+
+\clearpage
+
+\hypertarget{question-what-happens-to-these-estimates-if-you-drop-the-fixed-effects-from-the-specification.-why}{%
+\subsection{\texorpdfstring{3.7 \textbf{Question: What happens to these
+estimates if you drop the fixed effects from the specification. Why?
+}}{3.7 Question: What happens to these estimates if you drop the fixed effects from the specification. Why? }}\label{question-what-happens-to-these-estimates-if-you-drop-the-fixed-effects-from-the-specification.-why}}
+
+\textbf{Code:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rd2}\FloatTok{.3} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(average\_exp2 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ cash }\SpecialCharTok{+}\NormalTok{ credit }\SpecialCharTok{+}\NormalTok{ info}\SpecialCharTok{|}\DecValTok{0}\SpecialCharTok{|}\DecValTok{0}\SpecialCharTok{|}\NormalTok{village, }\AttributeTok{data =}\NormalTok{ rd2)}
+
+\FunctionTok{stargazer}\NormalTok{(rd2}\FloatTok{.3}\NormalTok{, }\AttributeTok{header =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{type =} \StringTok{"text"}\NormalTok{, }\AttributeTok{se =} \FunctionTok{list}\NormalTok{(rd2}\FloatTok{.3}\SpecialCharTok{$}\NormalTok{rse))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## ===============================================
+##                         Dependent variable:    
+##                     ---------------------------
+##                            average_exp2        
+## -----------------------------------------------
+## cash                         88.051***         
+##                              (27.096)          
+##                                                
+## credit                        49.136*          
+##                              (26.468)          
+##                                                
+## info                          -6.745           
+##                              (37.265)          
+##                                                
+## Constant                    954.133***         
+##                              (19.662)          
+##                                                
+## -----------------------------------------------
+## Observations                   1,869           
+## R2                             0.007           
+## Adjusted R2                    0.005           
+## Residual Std. Error     459.305 (df = 1865)    
+## ===============================================
+## Note:               *p<0.1; **p<0.05; ***p<0.01
+\end{verbatim}
+
+\textbf{Answer:} The coefficients are became smaller and less
+significant. There are time fixed effects and individual fixed effect.
+
+\clearpage
+
+\hypertarget{question-2-pagesreplicate-the-results-presented-in-the-third-row-of-the-fourth-and-fifth-columns-of-table-3.-what-happens-to-the-coefficient-and-standard-errors-is-this-surprising-what-does-this-tell-us}{%
+\subsection{\texorpdfstring{3.8 \textbf{Question: (2 pages)Replicate the
+results presented in the third row of the fourth and fifth columns of
+table 3. What happens to the coefficient and standard errors? Is this
+surprising? What does this tell
+us?}}{3.8 Question: (2 pages)Replicate the results presented in the third row of the fourth and fifth columns of table 3. What happens to the coefficient and standard errors? Is this surprising? What does this tell us?}}\label{question-2-pagesreplicate-the-results-presented-in-the-third-row-of-the-fourth-and-fifth-columns-of-table-3.-what-happens-to-the-coefficient-and-standard-errors-is-this-surprising-what-does-this-tell-us}}
+
+Hint: You will need to construct a new variable to run these estimates.
+
+\textbf{Code:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rd2}\SpecialCharTok{$}\NormalTok{cc }\OtherTok{=} \FunctionTok{ifelse}\NormalTok{(rd2}\SpecialCharTok{$}\NormalTok{cash }\SpecialCharTok{==} \DecValTok{1} \SpecialCharTok{|}\NormalTok{ rd2}\SpecialCharTok{$}\NormalTok{credit }\SpecialCharTok{==} \DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)}
+
+\NormalTok{rd2}\FloatTok{.4} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(average\_exp2 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ cc}\SpecialCharTok{|}\NormalTok{upazila}\SpecialCharTok{|}\DecValTok{0}\SpecialCharTok{|}\NormalTok{village, }\AttributeTok{data =}\NormalTok{ rd2)}
+\NormalTok{rd2}\FloatTok{.5} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(average\_exp2 }\SpecialCharTok{\textasciitilde{}}\NormalTok{(cc}\SpecialCharTok{+}\NormalTok{lit}\SpecialCharTok{+}\NormalTok{walls\_good}\SpecialCharTok{+}\NormalTok{subsistencer1}\SpecialCharTok{+}\NormalTok{num\_adltmalesr1}\SpecialCharTok{+}\NormalTok{num\_childrenr1}\SpecialCharTok{+}\NormalTok{constrainedr1}\SpecialCharTok{+}\NormalTok{bankedr1}\SpecialCharTok{+}\NormalTok{exp\_total\_pc\_r1}\SpecialCharTok{+}\NormalTok{monga}\SpecialCharTok{+}\NormalTok{avgQ13earned}\SpecialCharTok{+}\NormalTok{dhaka\_network}\SpecialCharTok{+}\NormalTok{dhaka\_remit)}\SpecialCharTok{|}\NormalTok{upazila}\SpecialCharTok{|}\DecValTok{0}\SpecialCharTok{|}\NormalTok{village, }\AttributeTok{data =}\NormalTok{ rd2)}
+
+\FunctionTok{stargazer}\NormalTok{(rd2}\FloatTok{.4}\NormalTok{, rd2}\FloatTok{.5}\NormalTok{, }\AttributeTok{header =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{type =} \StringTok{"text"}\NormalTok{, }\AttributeTok{se =} \FunctionTok{list}\NormalTok{(rd2}\FloatTok{.4}\SpecialCharTok{$}\NormalTok{rse, rd2}\FloatTok{.5}\SpecialCharTok{$}\NormalTok{rse), }\AttributeTok{title =} \StringTok{""}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## ===========================================================
+##                               Dependent variable:          
+##                     ---------------------------------------
+##                                  average_exp2              
+##                             (1)                 (2)        
+## -----------------------------------------------------------
+## cc                       68.359***           60.139**      
+##                          (23.991)            (23.488)      
+##                                                            
+## lit                                           -9.590       
+##                                              (10.952)      
+##                                                            
+## walls_good                                   97.810***     
+##                                              (22.030)      
+##                                                            
+## subsistencer1                               -328.904***    
+##                                              (113.356)     
+##                                                            
+## num_adltmalesr1                             -40.548***     
+##                                              (15.052)      
+##                                                            
+## num_childrenr1                              -129.078***    
+##                                              (13.439)      
+##                                                            
+## constrainedr1                                 -47.221      
+##                                              (42.062)      
+##                                                            
+## bankedr1                                     51.829**      
+##                                              (21.141)      
+##                                                            
+## exp_total_pc_r1                               0.075**      
+##                                               (0.038)      
+##                                                            
+## monga                                         -0.279       
+##                                               (0.544)      
+##                                                            
+## avgQ13earned                                 53.502***     
+##                                              (13.823)      
+##                                                            
+## dhaka_network                                  0.419       
+##                                               (0.393)      
+##                                                            
+## dhaka_remit                                    0.616       
+##                                               (0.444)      
+##                                                            
+## -----------------------------------------------------------
+## Observations               1,869               1,825       
+## R2                         0.044               0.147       
+## Adjusted R2                0.036               0.134       
+## Residual Std. Error 452.023 (df = 1854) 430.506 (df = 1798)
+## ===========================================================
+## Note:                           *p<0.1; **p<0.05; ***p<0.01
+\end{verbatim}
+
+\textbf{Answer:} Both coefficients and standard errors decreased.
+Because the control variable changed, column 5 indicates that the
+effects are generally robust to adding some controls for baseline
+characteristics, therefore it is not surpring.
+
+\clearpage
+
+\hypertarget{question-why-is-the-header-of-the-first-five-columns-of-table-3-itt.-what-is-meant-by-this-and-what-does-this-tell-us-about-how-we-should-interpret-these-results}{%
+\subsection{\texorpdfstring{3.9 \textbf{Question: Why is the header of
+the first five columns of table 3 ``ITT''. What is meant by this and
+what does this tell us about how we should interpret these
+results?}}{3.9 Question: Why is the header of the first five columns of table 3 ``ITT''. What is meant by this and what does this tell us about how we should interpret these results?}}\label{question-why-is-the-header-of-the-first-five-columns-of-table-3-itt.-what-is-meant-by-this-and-what-does-this-tell-us-about-how-we-should-interpret-these-results}}
+
+\textbf{Answer:} ITT: intend to treat The analysis is conducted on an
+intention-to-treat basis, irrespective of whether households received or
+completed the intended treatment. In Column 4, intent-to-treat estimates
+for ash and credit incentive treatments are presented together. Notably,
+there is an observed increase in average monthly household consumption
+in these incentive villages, leading to additional calories per person
+per day. Furthermore, Column 5 demonstrates the robustness of these
+effects, showing that they generally persist even after incorporating
+some controls for baseline characteristics.
+
+\clearpage
+
+\hypertarget{question-we-are-interested-in-estimating-how-migration-affects-total-expenditures-for-the-households-that-were-induced-to-migrate-by-the-cash-and-credit-treatments-as-follows}{%
+\subsection{\texorpdfstring{3.10 \textbf{Question: We are interested in
+estimating how migration affects total expenditures for the households
+that were induced to migrate by the cash and credit treatments as
+follows,}}{3.10 Question: We are interested in estimating how migration affects total expenditures for the households that were induced to migrate by the cash and credit treatments as follows,}}\label{question-we-are-interested-in-estimating-how-migration-affects-total-expenditures-for-the-households-that-were-induced-to-migrate-by-the-cash-and-credit-treatments-as-follows}}
+
+\[
+TotExp_{ivj}=\alpha+\beta_1Migrate_{ivj}+\theta X_{ivj}+\varphi_j+\nu_{ivj}
+\] \textbf{where \(Migrate_{ivj}\) is dummy indicator for if a member of
+household i in village v in subdistrict j migrated, \(X_{ivj}\) is a
+vector of control variables and \(\varphi_j\) are the subdistrict fixed
+effects. However it is not possible to identify in the data which
+households were induced by the treatment vs those who would have
+migrated either way. Furthermore, there is likely substantial selection
+between the households that select into migration versus those that do
+not. Propose a source of exogenous variation that can be used as an
+instrument to isolate ``good'' exogenous variation in migration. }
+
+\textbf{Answer:} Average skill score of network
+
+\clearpage
+
+\hypertarget{question-what-is-the-first-stage-specification}{%
+\subsection{\texorpdfstring{3.11 \textbf{Question: What is the first
+stage
+specification?}}{3.11 Question: What is the first stage specification?}}\label{question-what-is-the-first-stage-specification}}
+
+\textbf{Answer:} The first stage specification in the instrumental
+variable (IV) approach involves estimating the relationship between the
+instrumental variable (IV) and the endogenous variable. In this case,
+the endogenous variable is \(\varphi_j\) and IV is Average skill score
+of network.
+
+\clearpage
+
+\hypertarget{question-2-pages-estimate-the-first-stage-and-check-that-you-have-a-strong-instrument-for-migration.}{%
+\subsection{\texorpdfstring{3.12 \textbf{Question: (2 pages) Estimate
+the first stage and check that you have a strong instrument for
+migration.}}{3.12 Question: (2 pages) Estimate the first stage and check that you have a strong instrument for migration.}}\label{question-2-pages-estimate-the-first-stage-and-check-that-you-have-a-strong-instrument-for-migration.}}
+
+Note: The first stage results reported in the paper appendix may differ
+slightly as explained in the table footnote.
+
+\textbf{Code:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#first stage: check if instrument variable is related with X}
+
+\NormalTok{rd2}\FloatTok{.6} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(migrant }\SpecialCharTok{\textasciitilde{}}\NormalTok{ avgQ13earned, selectround2)}
+\NormalTok{rd2}\FloatTok{.7} \OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(migrant }\SpecialCharTok{\textasciitilde{}}\NormalTok{ avgQ13earned }\SpecialCharTok{+}\NormalTok{ cash }\SpecialCharTok{+}\NormalTok{ credit }\SpecialCharTok{+}\NormalTok{ info, selectround2)}
+
+\CommentTok{\#stargazer(rd2.5, header = FALSE, type = "text", se = list(rd2.3$rse))}
+\FunctionTok{summary}\NormalTok{(rd2}\FloatTok{.6}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+##    felm(formula = migrant ~ avgQ13earned, data = selectround2) 
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.8309 -0.4909  0.2341  0.4737  0.7991 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  -0.069125   0.060594  -1.141    0.254    
+## avgQ13earned  0.090001   0.009275   9.704   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.4879 on 1839 degrees of freedom
+##   (因为不存在，66个观察量被删除了)
+## Multiple R-squared(full model): 0.04871   Adjusted R-squared: 0.04819 
+## Multiple R-squared(proj model): 0.04871   Adjusted R-squared: 0.04819 
+## F-statistic(full model):94.16 on 1 and 1839 DF, p-value: < 2.2e-16 
+## F-statistic(proj model): 94.16 on 1 and 1839 DF, p-value: < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(rd2}\FloatTok{.7}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+##    felm(formula = migrant ~ avgQ13earned + cash + credit + info,      data = selectround2) 
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.8693 -0.4628  0.1979  0.4352  0.8579 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  -0.149507   0.063735  -2.346   0.0191 *  
+## avgQ13earned  0.081635   0.009187   8.886  < 2e-16 ***
+## cash          0.202448   0.033277   6.084 1.43e-09 ***
+## credit        0.187817   0.034237   5.486 4.69e-08 ***
+## info          0.006495   0.039537   0.164   0.8695    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.48 on 1836 degrees of freedom
+##   (因为不存在，66个观察量被删除了)
+## Multiple R-squared(full model): 0.08078   Adjusted R-squared: 0.07877 
+## Multiple R-squared(proj model): 0.08078   Adjusted R-squared: 0.07877 
+## F-statistic(full model):40.33 on 4 and 1836 DF, p-value: < 2.2e-16 
+## F-statistic(proj model): 40.33 on 4 and 1836 DF, p-value: < 2.2e-16
+\end{verbatim}
+
+\textbf{Answer:} F statistics are very large (greater than 10),
+therefore it's a strong instrument.
+
+\clearpage
+
+\hypertarget{question-2-pages-use-your-instrument-to-estimate-the-late-local-average-treatment-effect-the-impact-of-migration-on-total-consumption-for-those-induced-to-migrate-by-the-treatment-as-in-columns-6-and-7-of-table-3-in-the-paper.-interpret-your-results.}{%
+\subsection{\texorpdfstring{3.13 \textbf{Question: (2 pages) Use your
+instrument to estimate the LATE (Local Average Treatment Effect), the
+impact of migration on total consumption for those induced to migrate by
+the treatment, as in columns 6 and 7 of table 3 in the paper. Interpret
+your results.
+}}{3.13 Question: (2 pages) Use your instrument to estimate the LATE (Local Average Treatment Effect), the impact of migration on total consumption for those induced to migrate by the treatment, as in columns 6 and 7 of table 3 in the paper. Interpret your results. }}\label{question-2-pages-use-your-instrument-to-estimate-the-late-local-average-treatment-effect-the-impact-of-migration-on-total-consumption-for-those-induced-to-migrate-by-the-treatment-as-in-columns-6-and-7-of-table-3-in-the-paper.-interpret-your-results.}}
+
+Note: if you wish to replicate the paper's coefficients exactly, you
+will need to use multiple instruments, one for each treatment arm.
+
+\textbf{Code:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{LATE }\OtherTok{\textless{}{-}} \FunctionTok{felm}\NormalTok{(average\_exp2 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ migrant}\SpecialCharTok{|}\NormalTok{avgQ13earned, rd2)}
+
+\CommentTok{\#summary(LATE)}
+\FunctionTok{stargazer}\NormalTok{(LATE, }\AttributeTok{header =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{type =} \StringTok{"text"}\NormalTok{, }\AttributeTok{se =} \FunctionTok{list}\NormalTok{(LATE}\SpecialCharTok{$}\NormalTok{rse))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## ===============================================
+##                         Dependent variable:    
+##                     ---------------------------
+##                            average_exp2        
+## -----------------------------------------------
+## migrant                     104.682***         
+##                              (23.486)          
+##                                                
+## -----------------------------------------------
+## Observations                   1,837           
+## R2                             0.319           
+## Adjusted R2                    0.095           
+## Residual Std. Error     439.824 (df = 1381)    
+## ===============================================
+## Note:               *p<0.1; **p<0.05; ***p<0.01
+\end{verbatim}
+
+\textbf{Answer:} Migrant is positive related with total consumption, and
+it's statistics significant.
+
+\clearpage
+
+\hypertarget{question-why-are-these-results-different-from-those-in-columns-4-and-5-of-the-paper}{%
+\subsection{\texorpdfstring{3.14 \textbf{Question: Why are these results
+different from those in columns 4 and 5 of the paper?
+}}{3.14 Question: Why are these results different from those in columns 4 and 5 of the paper? }}\label{question-why-are-these-results-different-from-those-in-columns-4-and-5-of-the-paper}}
+
+\textbf{Answer:} Considered instrument variable, which can reduce the
+influence of bias. Also the variables need additional controls.
+
+\clearpage
+
+\hypertarget{question-why-is-this-value-particularly-relevant-for-policy-decisions-in-the-context-of-this-experiment.}{%
+\subsection{\texorpdfstring{3.15 \textbf{Question: Why is this value
+particularly relevant for policy decisions in the context of this
+experiment.}}{3.15 Question: Why is this value particularly relevant for policy decisions in the context of this experiment.}}\label{question-why-is-this-value-particularly-relevant-for-policy-decisions-in-the-context-of-this-experiment.}}
+
+\textbf{Answer:} The LATE specifically focuses on the subpopulation that
+is induced to migrate due to the treatment, allowing for a more precise
+understanding of the treatment's effect. Also the LATE helps identify
+the impact of migration for those households that were influenced by the
+cash and credit treatments, providing targeted insights for policy
+making.
+
+\clearpage
+
+\hypertarget{question-suppose-a-policy-maker-found-these-results-so-compelling-that-they-decided-to-make-this-a-national-policy.-how-would-general-equilibrium-effects-potentially-change-the-impacts-of-this-policy-if-it-was-implemented-in-a-very-large-scale-way}{%
+\subsection{\texorpdfstring{3.16 \textbf{Question: Suppose a policy
+maker found these results so compelling that they decided to make this a
+national policy. How would general equilibrium effects potentially
+change the impacts of this policy if it was implemented in a very large
+scale
+way?}}{3.16 Question: Suppose a policy maker found these results so compelling that they decided to make this a national policy. How would general equilibrium effects potentially change the impacts of this policy if it was implemented in a very large scale way?}}\label{question-suppose-a-policy-maker-found-these-results-so-compelling-that-they-decided-to-make-this-a-national-policy.-how-would-general-equilibrium-effects-potentially-change-the-impacts-of-this-policy-if-it-was-implemented-in-a-very-large-scale-way}}
+
+\textbf{Answer:} The policy may lead to changes in property values,
+rental prices, and housing availability. The policy could influence
+national labor market dynamics, leading to changes in wages and
+employment levels across industries and sectors. Shifts in the supply
+and demand for labor may vary regionally.
+
+\clearpage
+
+\hypertarget{question-one-major-concern-that-is-often-brought-up-in-discussions-about-rcts-is-the-problem-of-external-validity.-it-is-not-always-clear-how-informative-the-findings-from-a-small-scale-research-project-in-one-context-are-for-policy-makers-working-on-a-different-scale-and-in-different-contexts.-what-are-your-thoughts-on-the-external-validity-of-this-particular-project-and-rcts-in-general}{%
+\subsection{\texorpdfstring{3.17 \textbf{Question: One major concern
+that is often brought up in discussions about RCT's is the problem of
+external validity. It is not always clear how informative the findings
+from a small scale research project in one context are for policy makers
+working on a different scale and in different contexts. What are your
+thoughts on the external validity of this particular project and RCT's
+in general?
+}}{3.17 Question: One major concern that is often brought up in discussions about RCT's is the problem of external validity. It is not always clear how informative the findings from a small scale research project in one context are for policy makers working on a different scale and in different contexts. What are your thoughts on the external validity of this particular project and RCT's in general? }}\label{question-one-major-concern-that-is-often-brought-up-in-discussions-about-rcts-is-the-problem-of-external-validity.-it-is-not-always-clear-how-informative-the-findings-from-a-small-scale-research-project-in-one-context-are-for-policy-makers-working-on-a-different-scale-and-in-different-contexts.-what-are-your-thoughts-on-the-external-validity-of-this-particular-project-and-rcts-in-general}}
+
+\textbf{Answer:} The participants in RCTs are typically a specific
+sample, and the extent to which the results apply to a broader
+population depends on the diversity of the participants. If the study
+sample is not representative, external validity may be limited.
+
+\hypertarget{submission-instructions}{%
+\section{4. Submission instructions:}\label{submission-instructions}}
+
+\begin{itemize}
+\tightlist
+\item
+  Make sure the final version of your assignment is knit in pdf format
+  and uploaded to gradescope. Make sure you have one question response
+  per page (unless otherwise indicated) so that question positions align
+  with the template in gradescope.The final PDF should be 25 pages long.
+\end{itemize}
+
+\end{document}

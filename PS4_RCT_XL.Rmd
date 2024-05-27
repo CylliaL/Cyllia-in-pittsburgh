@@ -1,0 +1,367 @@
+---
+title: 'Problem Set 4: Randomized Control Trials'
+author: "Claire Duquennois"
+output:
+  html_document:
+    df_print: paged
+  word_document: default
+  pdf_document:
+    number_sections: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Name:**
+Xiang Li
+
+Instructions: 
+
+- This assignment is an individual assignment. You may discuss your responses in small groups or reach out to a classmate if you are having difficulties with coding but your code and answers must reflect your individual efforts and be written using your own words. Identical assignments will be given a zero grade. 
+
+
+
+# 1. Empirical Analysis using Data from Bryan, G., Chowdury, S., Mobarak, A. M. (2014, Econometrica)
+
+
+This exercise uses data from Bryan,Chowdhury, and Mobarak's paper, "Underinvestment in a Profitable Technology: the Case of Seasonal Migration in Bangladesh," published in *Econometrica* in 2014. This paper studies the effects of seasonal migration on household consumption during the lean season in rural Bangladesh by randomly subsidizing the cost of seasonal migration. 
+
+
+# 2. Set Up: 
+## 2.1 Finding the data
+
+The data can be found by going to Mushfiq Mobarak's Yale faculty page, select "data", and then following the link to the data repository page on the Harvard dataverse. You will need to sign in to get access to the data files. Once logged in, you will find many possible files to download. Navigate to the second page of listed files and download `Mobarak - Monga Dataverse files.zip` which contains all the files we need. 
+
+
+ \clearpage
+
+
+## 2.2 Question: Loading the data -  Load any packages you will need and the data contained in the following files `Round1_Controls_Table1.dta` and `Round2.dta`. How many observations are contained in each of these datasets. What is the level of an observation? Explain any discrepancies between the datasets.**
+
+**Code and Answer:**
+```{r}
+library("haven")
+library("dplyr")
+library("stargazer")
+library("lfe")
+```
+```{r}
+round1 <- read_dta("Round1_Controls_Table1.dta")
+round2 <- read_dta("Round2.dta")
+
+nrow(round1)
+nrow(round2)
+```
+Answer: There are 1900 observations contained in round1 and 1907 observations contained in round2. It's village/household level of observation. 
+People's moving made the difference.
+
+
+ \clearpage
+
+## 2.3 Question: (2 pages) Data Description- The dataset contains many variables, some of which are not used in this exercise. Keep the following variables in the final datasets (Hint: use the `select` function in `dplyr`).** 
+
+For Round 1 data:
+
+| Name            |Description                                                             |
+|-----------------|------------------------------------------------------------------------|
+|cash             |In cash treatment group                                                 |
+|credit           |In credit treatment group                                               |
+|info             |In information treatment group                                          |
+|control          |In control group                                                        |
+|q9pdcalq9        |Total calories per person per day                                       | 
+|exp_total_pc_r1  |Total monthly household expenditures per capita                         |
+|hhmembers_r1     |Number of household members                                             |
+|tsaving_hh_r1    |Total household savings                                                  |
+|hhh_education    |Household head is educated                                              |
+|num_adltmalesr1  |Number of adult males in the household                                  |
+
+For Round 2 data:
+
+| Name          |Description                                                             |
+|---------------|------------------------------------------------------------------------|
+|cash           |In cash treatment group                                                 |
+|credit         |In credit treatment group                                               |
+|info           |In information treatment group                                          |
+|control        |In control group                                                        |
+|average_exp2   |Total consumption per person per month in round 2                       |
+|lit            |Highest reading and writing ability of household                        |
+|walls_good     |Wall material (income proxy)                                            |
+|monga          |Subjective expectations about monga at baseline                         |
+|dhaka_remit    |Subjective expectations about migration remitances at baseline          |
+|dhaka_network  |Subjective expectations about social network in city at baseline        |
+|exp_total_pc_r1|Total household expenditures per capita at baseline                     |
+|subsistencer1  |Share of food out of total expenditures at baseline                     |
+|num_adltmalesr1|Household adult males at baseline                                       |
+|num_childrenr1 |Household small children at baseline                                    |
+|avgQ13earned   |Average skill score of network                                          |
+|constrainedr1  |Denied or ineligible for credit at baseline                             |
+|bankedr1       |Has received credit at baseline                                         |
+|upazila        |Sub-district name                                                       |
+|village        |Village name                                                            |
+|migrant        |Member of household migrates this season                                |
+|total_fish     |Total monthly household expenditures per capita on fish                 |
+|migrant_new    |Household has a first time migrant this season                          |
+
+
+
+**A description of each variable should appear in the column headers of the loaded data. **
+
+**Code:**
+```{r}
+selectround1 <- select(round1, cash, credit, info, control, q9pdcalq9, exp_total_pc_r1, hhmembers_r1, tsaving_hh_r1, hhh_education, num_adltmalesr1)
+selectround2 <- select(round2, cash, credit, info, control, average_exp2, lit, walls_good, monga, dhaka_remit, dhaka_network, exp_total_pc_r1, subsistencer1, num_adltmalesr1, num_childrenr1, avgQ13earned, constrainedr1, bankedr1, upazila, village, migrant, total_fish, migrant_new)
+```
+
+
+
+ \clearpage
+
+
+# 3. Analysis:
+
+## 3.1 **Question: Regress all the baseline household characteristics still included in the round 1 data  on the following three variables: $cash_i$, $credit_i$ and $info_i$, and present your results in a table. What is the equivalent table in the paper?** 
+
+**Code:**
+```{r}
+colnames(selectround1)[colnames(selectround1) == "q9pdcalq9"] <- "TotalCalories"
+colnames(selectround1)[colnames(selectround1) == "exp_total_pc_r1"] <- "TotalMonthlyHouseholdExpenditures"
+colnames(selectround1)[colnames(selectround1) == "hhmembers_r1"] <- "HouseholdMembers"
+colnames(selectround1)[colnames(selectround1) == "tsaving_hh_r1"] <- "TotalHouseholdSavings"
+colnames(selectround1)[colnames(selectround1) == "hhh_education"] <- "HouseholdHeadIsEducated"
+colnames(selectround1)[colnames(selectround1) == "num_adltmalesr1"] <- "AdultMales_inthehousehold"
+```
+
+```{r}
+rd1.1 <- felm(TotalCalories ~ cash + credit + info, selectround1)
+rd1.2 <- felm(TotalMonthlyHouseholdExpenditures ~ cash + credit + info, selectround1)
+rd1.3 <- felm(HouseholdMembers ~ cash + credit + info, selectround1)
+rd1.4 <- felm(TotalHouseholdSavings ~ cash + credit + info, selectround1)
+rd1.5 <- felm(HouseholdHeadIsEducated ~ cash + credit + info, selectround1)
+rd1.6 <- felm(AdultMales_inthehousehold ~ cash + credit + info, selectround1)
+
+stargazer(rd1.1, rd1.2, rd1.3, rd1.4, rd1.5, rd1.6, header = FALSE, type = "text", se = list(rd1.1$rse, rd1.2$rse, rd1.3$rse, rd1.4$rse, rd1.5$rse, rd1.6$rse))
+```
+
+
+**Answer:** 
+the equivalent table in the paper is table 1
+
+ \clearpage
+
+
+## 3.2 **Question: How should the coefficients in the table above be interpreted? What should we look for in this table?**
+
+**Answer:**
+We need to check if the coefficients are positive or negative. All the baseline household characteristics are negative relative with cash. Except TotalMonthlyHouseholdExpenditures, other characteristics are negative with credit. Except HouseholdMembers and TotalHouseholdSavings, other characteristics are negative with info. 
+And they are all not statistics significant, which is exactly what we need.
+The treatment influences the consumption only through migrant by randomization.
+
+
+ \clearpage
+
+
+## 3.3 **Question: Using the round 2 data, regress migrant on the treatment arm indicators. What is the equivalent table in the paper?**
+
+**Code:**
+```{r}
+rd2.1 <- felm(migrant ~ cash + credit + info, selectround2)
+stargazer(rd2.1, header = FALSE, type = "text", se = list(rd2.1$rse))
+```
+
+
+
+**Answer:** 
+the equivalent table in the paper is table 2
+
+ \clearpage
+
+
+## 3.4 **Question: How should the coefficients in the table above be interpreted? Why is this table important?**
+
+**Answer:**
+Migrant is positive related with cash and credit and statistics significant but negative related with info and not statistics significant.
+
+ \clearpage
+
+
+## 3.5 **Question: What is the underlying migration rate in the control group and how might this change our interpretation of the results? **
+
+**Answer:**
+The underlying migration rate in the control group is 0.360. By dummy variable, one additional cash predicts migrant 0.230+0.360 higher, one additional credit predicts 0.208+0.360 higher, and one additional info predicts -0.0004+0.360 higher.
+
+
+ \clearpage
+
+## 3.6 **Question: (2 pages) Replicate the results presented in the third row of the first three columns of table 3. Present them in a table and interpret these results. **
+
+Note 1: The authors elect to drop one household observation because the reported value of total fish consumed in the household is very high. 
+
+Note 2: To replicate the standard errors in the paper you will need to cluster your standard errors at the village level. We will discuss clustering later in the semester.  Using `felm` you can specify the level of clustering (`clustervariable`) using the following command:
+
+`reg<-felm(Y~x1|fevariables|ivfirststage|clustervariable, dataname)` 
+
+where you can replace fevariables and ivfirststage with 0 if you are not using fixed effects or an instrument. 
+
+
+**Code:**
+```{r}
+rd2 <- subset(selectround2, total_fish < 16359)
+
+rd2.2 <- felm(average_exp2 ~ cash + credit + info|upazila|0|village, data = rd2)
+
+stargazer(rd2.2, header = FALSE, type = "text", se = list(rd2.2$rse))
+```
+
+
+**Answer:**
+Total consumption is positive related with cash, credit and info, and it is statistics significant on cash and credit. 
+
+
+ \clearpage
+
+
+## 3.7 **Question: What happens to these estimates if you drop the fixed effects from the specification. Why? **
+
+**Code:**
+```{r}
+rd2.3 <- felm(average_exp2 ~ cash + credit + info|0|0|village, data = rd2)
+
+stargazer(rd2.3, header = FALSE, type = "text", se = list(rd2.3$rse))
+```
+
+**Answer:**
+The coefficients are became smaller and less significant. There are time fixed effects and individual fixed effect.
+
+ \clearpage
+
+
+## 3.8 **Question: (2 pages)Replicate the results presented in the third row of the fourth and fifth columns of table 3. What happens to the coefficient and standard errors? Is this surprising? What does this tell us?**
+
+Hint: You will need to construct a new variable to run these estimates. 
+
+**Code:**
+```{r}
+rd2$cc = ifelse(rd2$cash == 1 | rd2$credit == 1, 1, 0)
+
+rd2.4 <- felm(average_exp2 ~ cc|upazila|0|village, data = rd2)
+rd2.5 <- felm(average_exp2 ~(cc+lit+walls_good+subsistencer1+num_adltmalesr1+num_childrenr1+constrainedr1+bankedr1+exp_total_pc_r1+monga+avgQ13earned+dhaka_network+dhaka_remit)|upazila|0|village, data = rd2)
+
+stargazer(rd2.4, rd2.5, header = FALSE, type = "text", se = list(rd2.4$rse, rd2.5$rse), title = "")
+```
+
+
+
+**Answer:**
+Both coefficients and standard errors decreased.
+Because the control variable changed, column 5 indicates that the effects are generally robust to adding some controls for baseline characteristics, therefore it is not surpring.
+
+
+ \clearpage
+
+
+## 3.9 **Question: Why is the header of the first five columns of table 3 "ITT". What is meant by this and what does this tell us about how we should interpret these results?**
+
+**Answer:**
+ITT: intend to treat
+The analysis is conducted on an intention-to-treat basis, irrespective of whether households received or completed the intended treatment. In Column 4, intent-to-treat estimates for ash and credit incentive treatments are presented together. Notably, there is an observed increase in average monthly household consumption in these incentive villages, leading to additional calories per person per day. Furthermore, Column 5 demonstrates the robustness of these effects, showing that they generally persist even after incorporating some controls for baseline characteristics.
+
+
+ \clearpage
+
+## 3.10 **Question: We are interested in estimating how migration affects total expenditures for the households that were induced to migrate by the cash and credit treatments as follows,**
+
+$$
+TotExp_{ivj}=\alpha+\beta_1Migrate_{ivj}+\theta X_{ivj}+\varphi_j+\nu_{ivj}
+$$
+**where $Migrate_{ivj}$ is dummy indicator for if a member of household i in village v in subdistrict j migrated, $X_{ivj}$ is a vector of control variables and $\varphi_j$ are the subdistrict fixed effects. However it is not possible to identify in the data which households were induced by the treatment vs those who would have migrated  either way. Furthermore, there is likely substantial selection between the households that select into migration versus those that do not. Propose a source of exogenous variation that can be used as an instrument to isolate "good" exogenous variation in migration. **
+
+**Answer:**
+Average skill score of network
+
+ \clearpage
+
+
+## 3.11 **Question: What is the first stage specification?**
+**Answer:**
+The first stage specification in the instrumental variable (IV) approach involves estimating the relationship between the instrumental variable (IV) and the endogenous variable. In this case, the endogenous variable is $\varphi_j$ and IV is Average skill score of network.
+
+
+ \clearpage
+
+## 3.12 **Question: (2 pages) Estimate the first stage and check that you have a strong instrument for migration.**
+
+ Note: The first stage results reported in the paper appendix may differ slightly as explained in the table footnote.  
+
+**Code:**
+```{r}
+##first stage: check if instrument variable is related with X
+
+rd2.6 <- felm(migrant ~ avgQ13earned, selectround2)
+rd2.7 <- felm(migrant ~ avgQ13earned + cash + credit + info, selectround2)
+
+#stargazer(rd2.5, header = FALSE, type = "text", se = list(rd2.3$rse))
+summary(rd2.6)
+summary(rd2.7)
+```
+
+**Answer:**
+F statistics are very large (greater than 10), therefore it's a strong instrument.
+
+ \clearpage
+
+
+## 3.13 **Question: (2 pages) Use your instrument to estimate the LATE (Local Average Treatment Effect), the impact of migration on total consumption for those induced to migrate by the treatment, as in columns 6 and 7 of table 3 in the paper. Interpret your results. **
+
+Note: if you wish to replicate the paper's coefficients exactly, you will need to use multiple instruments, one for each treatment arm.
+
+**Code:**
+```{r}
+LATE <- felm(average_exp2 ~ migrant|avgQ13earned, rd2)
+
+#summary(LATE)
+stargazer(LATE, header = FALSE, type = "text", se = list(LATE$rse))
+```
+
+
+**Answer:**
+Migrant is positive related with total consumption, and it's statistics significant.
+
+ \clearpage
+
+## 3.14 **Question: Why are these results different from those in columns 4 and 5 of the paper?  **
+
+**Answer:** 
+Considered instrument variable, which can reduce the influence of bias. Also the variables need additional controls.
+
+ \clearpage
+
+## 3.15 **Question: Why is this value particularly relevant for policy decisions in the context of this experiment.**
+
+**Answer:**
+The LATE specifically focuses on the subpopulation that is induced to migrate due to the treatment, allowing for a more precise understanding of the treatment's effect. Also the LATE helps identify the impact of migration for those households that were influenced by the cash and credit treatments, providing targeted insights for policy making.
+
+ \clearpage
+
+## 3.16 **Question: Suppose a policy maker found these results so compelling that they decided to make this a national policy. How would general equilibrium effects potentially change the impacts of this policy if it was implemented in a very large scale way?**
+
+**Answer:**
+The policy may lead to changes in property values, rental prices, and housing availability.
+The policy could influence national labor market dynamics, leading to changes in wages and employment levels across industries and sectors. Shifts in the supply and demand for labor may vary regionally.
+
+
+ \clearpage
+
+## 3.17 **Question: One major concern that is often brought up in discussions about RCT's is the problem of external validity. It is not always clear how informative the findings from a small scale research project in one context are for policy makers working on a different scale and in different contexts. What are your thoughts on the external validity of this particular project and RCT's in general? **
+
+**Answer:**
+The participants in RCTs are typically a specific sample, and the extent to which the results apply to a broader population depends on the diversity of the participants. If the study sample is not representative, external validity may be limited.
+
+
+# 4. Submission instructions:
+
+
+- Make sure the final version of your assignment is knit in pdf format and uploaded to gradescope. Make sure you have one question response per page (unless otherwise indicated) so that question positions align with the template in gradescope.The final PDF should be 25 pages long. 
+
+
+

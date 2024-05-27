@@ -1,0 +1,477 @@
+---
+title: 'Problem Set 2: Omitted Variable Bias Key'
+author: "Claire Duquennois"
+output:
+  word_document: default
+  pdf_document:
+    number_sections: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+***Group Member 1:***
+Scott Heyman
+***Group Member 2:***
+Xiang Li
+
+***Group Member 3:***
+Aileen Wang
+
+# Empirical Analysis using Data from Washington (2008, AER)
+
+
+This exercise uses data from Ebonya Washington's paper, "Female Socialization: How Daughters Affect their Legislator Father's voting on Women's Issues," published in the *American Economic Review* in 2008. This paper studies whether having a daughter affects legislator's voting on women's issues. 
+
+
+# Finding the data
+
+The data can be found by following the link on the AER's website which will take you to the ICPSR's data repository. You will need to sign in to get access to the data files. Once logged in, you will find the set of files that are typically included in a replication file. These include several datasets, several .do files (which is a STATA command file), and text files with the data descriptions which tell you about the different variables included in the dataset. For this assignment we will be using the `basic.dta` file.
+
+
+Download it and save it in a `data' folder located in the same folder as your project repository. Since some datasets in this course will be big, we want to avoid keeping the data on github so I would recommend not placing the data in the project repository itself. 
+
+
+
+# Set up and opening the data
+
+Because this is a `.dta` file, you will need to open it with the `read.dta` function that is included in the `haven` packages.
+
+Other packages you will need: `dplyr`, `stargazer` and `lfe`. 
+
+Remember, if you have not used a package before you will need to install the package as follows
+
+```{r packages}
+
+#install.packages('haven',repos = "http://cran.us.r-project.org")
+#install.packages("dplyr",repos = "http://cran.us.r-project.org")
+#install.packages("stargazer",repos = "http://cran.us.r-project.org")
+#install.packages("lfe",repos = "http://cran.us.r-project.org")
+
+```
+Hint: Once you have run these once, on your machine, you may want to comment them out with a # so that your code runs faster.
+
+This .Rmd file will be opened on different computers. But you don't want to have to change the filepaths each time you pull a new version off of GitHub. Because of this, I would recommend you avoid using any computer specific filepaths in your code. Instead, make sure you and your groupmates structure your project folders in the same way and only specify filepaths within your project folder. R uses the folder where you are saving your code as it's default "working directory" (where things will be saved or be searched for unless specified otherwise). You can move up to the parent folder by using `..` in the file path. Thus, if your data is not saved in the forked github repository but is saved in a folder called `data` next to it you can call your data with the following file path: `"../data/basic.dta"`.
+
+
+## Question: Now that the packages are installed, call all your packages and load your data. How many observations are in the original dataset?
+
+**Code:**
+```{r}
+library("haven")
+library("dplyr")
+library("stargazer")
+library("lfe")
+```
+
+```{r}
+basic <- read_dta("basic.dta")
+count(basic)
+```
+
+
+
+**Answer:**  
+There are 1740 observations in the original dataset.
+
+\clearpage
+
+# Cleaning the data
+
+## Question: The original dataset contains data from the 105th to 108th U.S. Congress. We only use the observations from the 105th congress. Refer to the data documentation to find the relevant variable and then use the `filter` function in the `dplyr` package to extract observations from the 105th congress.
+
+**Code:**
+```{r}
+basic_105 <- filter(basic, congress == "105")
+count(basic_105)
+```
+
+
+\clearpage
+
+## Question:The dataset contains many variables, some of which are not used in this exercise. Keep the following variables in the final dataset (Hint: use the `select` function in `dplyr`).
+
+| Name     |Description                                                             |
+|----------|------------------------------------------------------------------------|
+|aauw	     |AAUW score                                                              | 
+|totchi	   |Total number of children                                                |
+|ngirls	   |Number of daughters                                                     |
+|party	   |Political party. Democrats if 1, Republicans if 2, and Independent if 3.|
+|famale	   |Female dummy variable                                                   |
+|white	   |White dummy variable                                                    |
+|srvlng	   |Years of service                                                        | 
+|age	     |Age                                                                     |
+|demvote	 |State democratic vote share in most recent presidential election        |
+|medinc	   |District median income                                                  |
+|perf	     |Female proportion of district voting age population                     | 
+|perw	     |White proportion of total district population                           |
+|perhs	   |High school graduate proportion of district population age 25           |
+|percol	   |College graduate proportion of district population age 25               |
+|perur	   |Urban proportion of total district population                           |
+|moredef	 |State proportion who favor more defense spending                        |
+|statabb	 |State abbreviation                                                      |
+|district	 |id for electoral district                                               | 
+|rgroup    |religious group                                                         |
+|region    |region                                                                  |
+
+**You can find the detailed description of each variable in the original paper. The main variable in this analysis is `AAUW`, a score created by the American Association of University Women (AAUW). For each congress, AAUW selects pieces of legislation in the areas of education, equality, and reproductive rights. The AAUW keeps track of how each legislator voted on these pieces of legislation and whether their vote aligned with the AAUW’s position. The legislator’s score is equal to the proportion of these votes made in agreement with the AAUW.**
+
+**Code:**
+```{r}
+finaldata <- select(basic_105, aauw,totchi,ngirls,party,female,white,srvlng,age,demvote,medinc,perf,perw,perhs,percol,perur,moredef,statabb,district,rgroup,region)
+```
+
+\clearpage
+
+
+## Question: Make sure your final dataset is a data frame. You can check your data's format with the command `is`. If the first element of the returned vector is not "data.frame", convert your dataset with the function `as.data.frame`. 
+
+**Code:**
+```{r}
+is(finaldata)
+```
+
+\clearpage
+
+
+#  Summary Statistics
+
+## Question: Report summary statistics of the following variables in the dataset: political party, age, race, gender, AAUW score, the number of children, and the number of daughters. Present these summary statistics in a formatted table, you can use `stargazer` or other packages. Make this table as communicative as possible.
+
+Hints: If you want RMarkdown to display your outputted table, include the code `results = "asis"` in the chunk header. This is true for all chunks that output a formatted table. In the stargazer command, you will want to specify the format of the table by including the code `results="html"` for html output or `results="latex"` for a pdf output.
+
+**Code:**
+```{r}
+summary(finaldata, results = "asis")
+```
+
+\clearpage
+
+
+#  Generate Variables
+
+## Question:Construct a variable called $repub_i$, a binary set to 1 if the observation is for a republican. 
+
+**Code:**
+```{r}
+finaldata$repub_i <- ifelse(finaldata$party == 2, 1, 0)
+```
+
+\clearpage
+
+
+# Run Estimations
+
+## Question: (2 pages) Estimate the following linear regression models using the `felm` command (part of the lfe package). Report your regression results in a formatted table using a package such as `stargazer`. Report robust standard errors in your table (Hint: in stargazer specify `se = list(model1$rse, model2$rse, model3$rse)`). Make this table as informative as possible by adding needed information and removing superfluous information.
+
+
+$$
+\begin{aligned}
+ aauw_i&=\beta_0+\beta_1ngirls_i+\epsilon_i\\
+ aauw_i&=\beta_0+\beta_1ngirls_i+\beta_2totchi+\epsilon_i\\
+  aauw_i&=\beta_0+\beta_1ngirls_i+\beta_2totchi+\beta_3female_i+\beta_4repub_i+\epsilon_i\\
+\end{aligned}
+$$
+
+
+**Code:**
+```{r}
+reg.1 <- felm(aauw ~ ngirls, finaldata)
+reg.2 <- felm(aauw ~ ngirls+totchi, finaldata)
+reg.3 <- felm(aauw ~ ngirls+totchi+female+repub_i, finaldata)
+
+stargazer(reg.1, reg.2, reg.3, header = FALSE, type = "text", se = list(reg.1$rse, reg.2$rse, reg.3$rse))
+```
+```{r}
+reg.1 <- felm(aauw ~ ngirls, finaldata)
+reg.2 <- felm(aauw ~ ngirls|totchi, finaldata)
+reg.3 <- felm(aauw ~ ngirls|totchi+female+repub_i, finaldata)
+
+stargazer(reg.1, reg.2, reg.3, header = FALSE, type = "text", se = list(reg.1$rse, reg.2$rse, reg.3$rse))
+```
+
+
+
+\clearpage
+
+## Question: (2 pages) Compare the OLS estimates of $\beta_1$ across the above three specifications. Discuss what explains the difference (if any) of the estimate across three specifications? Which control variable is particularly important and why?
+
+**Code:**
+```{r}
+beta1_model1 <- coef(reg.1)["ngirls"]
+beta1_model2 <- coef(reg.2)["ngirls"]
+beta1_model3 <- coef(reg.3)["ngirls"]
+
+c(beta1_model1, beta1_model2, beta1_model3)
+```
+
+
+**Answer:**
+Control variables are different from the three models, the first model only considered ngirls (number of daughters), the second one considered ngirls and totchi (total number of children), the third one also included these two variables and added female and repub_i(two dummy variables).
+If we just look into the first model, it may seem that the number of girls has negative correlation, however, once we run the other models, it becomes clear that there was likely omitted variable bias and that the number of girls is positvely correlated.
+
+repub_i is important because it has the largest influence and it's significant.
+
+
+\clearpage
+
+
+## Question:  Consider the third specification (with 3 controls in addition to $ngirls_i$. Conditional on the number of children and other variables, do you think $ngirls_i$ is plausibly exogenous? What is the identifying assumption necessary for $\beta_1$ to be interpreted as a causal estimate? What evidence does Washington give to support this assumption?
+
+**Answer:**
+$ngirls_i$ is plausibly exogenous. 
+Assumption: conditional on number of children, the number of female children is a random variable. 
+According to the data in the appendix, representatives did not follow the rule of stopping childbearing based on preference for children, and voters did not consider the gender mix of children in their selection of representatives.
+
+\clearpage
+
+
+## Question: (2 pages) It is possible that the effects of having daughters might be different for female and male legislators. Estimate four different models to think about this question: the equivalent of model 3 separately on men and women, model 3 with a single interaction term added, and model 3 with three interaction terms added. Present your results in a table. Is there evidence that the effect of a daughter differs for male and female legislators? Of the four models you estimated, which are equivalent, which are different, and why? 
+
+**Code:**
+```{r}
+data_male <- filter(finaldata, female == 0)
+data_female <- filter(finaldata, female == 1)
+
+reg.m <- felm(aauw ~ ngirls+totchi+female+repub_i, data_male)
+reg.f <- felm(aauw ~ ngirls+totchi+female+repub_i, data_female)
+reg.mn <- felm(aauw ~ ngirls+totchi+female+repub_i+female*ngirls, finaldata)
+reg.3n <- felm(aauw ~ ngirls+totchi+female+repub_i+female*ngirls+totchi*ngirls+repub_i*ngirls, finaldata)
+
+stargazer(reg.m, reg.f, reg.mn,reg.3n, header = FALSE, type = "text", se = list(reg.m$rse, reg.f$rse,reg.mn$rse,reg.3n$rse))
+```
+
+
+**Answer:**
+It seems as if there is a difference between male and females with males being effected more by having daughters than females. 
+3 is the same as 1 and 2 if applied to the male and female dataset respectivly.
+
+\clearpage
+
+
+# Fixed Effects:
+
+
+## Question: (2 pages) Equation 1 from Washington's paper is a little bit different from the equations you have estimated so far. Estimate the three models specified below (where $\gamma_i$ is a fixed effect for the number of children). Present your results in a table and explain the difference between the three models.
+
+$$
+\begin{aligned}
+ aauw_i&=\beta_0+\beta_1ngirls_i+\beta_2totchi+\epsilon_i\\
+  aauw_i&=\beta_0+\beta_1ngirls_i+\beta_2chi1+...+\beta_{10}chi10 +\epsilon_i\\
+    aauw_i&=\beta_0+\beta_1ngirls_i+\gamma_i+\epsilon_i\\
+\end{aligned}
+$$
+
+Hint: you will need to generate the dummy variables for the second equation or code it as `factor()`. For the third equation, the `felm` function allows you to specify fixed effects. 
+
+**Code:**
+```{r}
+reg.1 <- felm(aauw ~ ngirls+totchi, finaldata)
+reg.2 <- felm(aauw ~ ngirls+as.factor(totchi), finaldata)
+reg.3 <- felm(aauw ~ ngirls|totchi, finaldata)
+
+stargazer(reg.1, reg.2, reg.3, header = FALSE, type = "text", se = list(reg.1$rse, reg.2$rse, reg.3$rse))
+```
+
+
+**Answer:**
+The first model looks at the number of girls and the total number of childern with no dummy variables. The seccond model has a dummy variable for each total amount of kids you could have (1-10). The third looks at the number of kids as a fixed effect.
+
+\clearpage
+
+## Question: (2 pages) Reproduce the results in column 2 of table 2 from Washington's paper. 
+
+**Code:**
+
+```{r}
+# add age square and srvlng to data 
+finaldata$age2 <- finaldata$age^2
+finaldata$srvlng2 <- finaldata$srvlng^2
+
+#reg.2 <- felm(aauw ~ ngirls+as.factor(totchi), finaldata)
+
+reg.t2 <- felm(data = finaldata, aauw ~ ngirls+female+white+repub_i+age+age2+srvlng+srvlng2+as.factor(rgroup)+demvote|totchi+region)
+
+stargazer(reg.t2, header = FALSE, type = "text", se = list(reg.t2$rse))
+```
+
+\clearpage
+
+
+## Question: Explain what the region fixed effects are controlling for?
+
+**Answer:** 
+They are controlling for the differences in regions. Rather than comparing all of the regions it is comparing the different congress members within their respective regions.
+
+\clearpage
+
+
+## Question: (2 pages) Reload the data and this time we will keep observations from all of the congresses. Generate a variable that creates a unique identifier for region by year. Estimate the following models and present your results in a table.
+
+
+$$
+\begin{aligned}
+    aauw_i&=\beta_0+\beta_1ngirls_i+\gamma_i+\phi_i+\epsilon_i\\
+    aauw_i&=\beta_0+\beta_1ngirls_i+\gamma_i+\phi_i+\eta_i+\epsilon_i\\
+    aauw_i&=\beta_0+\beta_1ngirls_i+\gamma_i+\theta_i+\epsilon_i\\
+    aauw_i&=\beta_0+\beta_1ngirls_i+\rho_i+\epsilon_i\\
+\end{aligned}
+$$
+
+**$\gamma_i$ is a fixed effect for the total number of children, $\phi_i$ is a region fixed effect, $\eta_i$ is a year (congress session) fixed effect and $\theta_i$ is a region by year fixed effect and $\rho_i$ is a total children by region by year fixed effect. Explain what the differences between these four different estimation. Is there a downside to a specification like the fourth specification? ** 
+
+**Code:**
+```{r}
+# build year fixed effect
+data8 <- basic
+
+data8$uniqueYearRegion <- paste(data8$year, data8$region, sep="_")
+data8$uniqueYearRegionChildren <- paste(data8$year, data8$region, data8$totchi, sep="_")
+
+
+# make regressions 
+reg.1 <- felm(data = data8, aauw ~ ngirls|totchi+region)
+reg.2 <- felm(data = data8, aauw ~ ngirls|totchi+region+congress)
+reg.3 <- felm(data = data8, aauw ~ ngirls|totchi+region+uniqueYearRegion)
+reg.4 <- felm(data = data8, aauw ~ ngirls|uniqueYearRegionChildren)
+
+stargazer(reg.1, reg.2, reg.3, reg.4, header = FALSE, type = "text", se = list(reg.1$rse, reg.2$rse, reg.3$rse, reg.4$rse))
+```
+
+
+**Answer:**
+the first 2 have have no combined fixed effects. This means if we wanted to we could see the effects of each variable on the result. The third has a combined year and region. The downside to the fourth method is that, since all of the fixed effects are combined, it may be difficult to tell what the effects of the different variables are. Additionally, the data may become too specific.
+
+\clearpage
+
+
+## Question: In her paper, Washington chooses not to pool the data for all four congresses and instead estimates her main specification on each year separately. Why do you think she makes this choice? 
+
+**Answer:** 
+she examines each year seperatly because she does not want the variance between the different congresses effecting her results. She can come to a more accurate conclusion looking at each individual congress.
+
+\clearpage
+
+
+## Question: Check to see that names uniquely identify each congress person. If you are not sure if they do, make a unique identifier for each congress person.
+
+
+**Answer:**
+They are all unique for each givin congress. If they werent there would be a value that was equal TRUE
+**Code:**
+```{r}
+name_105 <- basic_105$name
+basic_106 <- filter(basic, congress == "106")
+basic_107 <- filter(basic, congress == "107")
+basic_108 <- filter(basic, congress == "108")
+name_106 <- basic_106$name
+name_107 <- basic_107$name
+name_108 <- basic_108$name
+duplicated(name_105)
+duplicated(name_106)
+duplicated(name_107)
+duplicated(name_108)
+```
+
+\clearpage
+
+
+
+## Question:(2 pages) Because we have data for four congress sessions, we may be able to see how an individual congress person's voting patterns change as the number of daughters they have changes. Propose an estimating equation that would allow you to estimate this, run your estimation and present your results. Be sure to define all new variables. What do your results tell you? Why?
+
+**Equation:**
+We have to build a dataset of congress members whos number of children changed between different congresses
+then run a regression with the number of girls, total children, female, and republican 
+$$
+\begin{aligned}
+  aauw_i&=\beta_0+\beta_1ngirls_i+\beta_2totchi+\beta_3female_i+\beta_4repub_i+\epsilon_i\\
+\end{aligned}
+$$
+
+**Code:**
+```{r}
+# have to be in congress twice 
+dataCD <- basic
+# Remove duplicates by single column
+data_repeat <- dataCD %>%
+  group_by(name) %>%
+  filter(n()>1) 
+
+
+# Number of daughters changed. Looks at people who have had a change in the number of daughters and have served multiple terms 
+changed_daughters <- data_repeat %>%
+  group_by(name) %>%
+  filter(length(unique(ngirls)) > 1) %>%
+  ungroup()
+
+# same as before but looks only after someone has had an additional daughter. Gets rid of whatever they were befores having another daughter while in congress
+changed_daughters2 <- data_repeat %>%
+  group_by(name) %>%
+  arrange(congress) %>%  # Sort by year to ensure chronological order
+  filter(ngirls > lag(ngirls, default = first(ngirls))) %>%
+  ungroup()
+
+
+reg.1 <- felm(aauw ~ ngirls+totchi+female+repub, changed_daughters)
+reg.2 <- felm(aauw ~ ngirls+totchi+female+repub, changed_daughters2)
+print(summary(reg.1),digits=3)
+print(summary(reg.2),digits=3)
+```
+
+**Answer:**
+The results are pretty inconclusive from this test. The only significant coefficient is republican which makes sense. This has daughters positive but as mentioned earlier it is not significant. 
+
+
+\clearpage
+
+
+## Question: Can you think of any identification concerns with this approach?
+It is likely that the pool of people is simply too small which would make it difficult to have a significant coefficient regarding the number of daughters. Maybe if we used more congresses, a better conclusion could be made 
+
+
+**Answer:** 
+\clearpage
+
+
+## Question: (2 pages) Using data from all four congresses, estimate the same specification as that used in column 2 of table 2 with the addition of year and individual fixed effects and report your results. Why aren't you able to estimate a coefficient for certain covariates? 
+
+**Code:**
+```{r}
+# add age square and srvlng to data
+basicdata <- basic
+
+basicdata$age2 <- basicdata$age^2
+basicdata$srvlng2 <- basicdata$srvlng^2
+basicdata$repub_i <- ifelse(basicdata$party == 2, 1, 0)
+
+#reg.2 <- felm(aauw ~ ngirls+as.factor(totchi), finaldata)
+
+reg.89 <- felm(data = basicdata, aauw ~ ngirls+female+white+repub_i+age+age2+srvlng+srvlng2+as.factor(rgroup)+demvote|totchi+region+congress+name)
+
+stargazer(reg.89, header = FALSE, type = "text", se = list(reg.89$rse))
+```
+**Answer:** 
+since we added all of the years and the added fixed variables we now have to deal with more multicolinearity.
+\clearpage
+
+## Question: Which fixed effects from the original specification are now redundant?
+
+
+**Answer:**
+female, white, and religion are all redundunt because they are included in the fixed effect
+\clearpage
+
+
+## Question: Can you estimate a coefficient for $Repub$? What does this imply?
+
+**Answer:**
+we can estimate a coefficient for repub which implies that it is not included in the fixed effect.
+
+# Submission instructions:
+- Since this is a group assignment only one member of the group will upload it to gradescope. 
+
+- Make sure the final version of your assignment is knit in pdf format and uploaded to gradescope. Make sure you have one question response per page (unless otherwise indicated) so that question positions align with the template in gradescope.The final PDF should be 29 pages long. 
+
+
+
+
