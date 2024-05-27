@@ -1,0 +1,329 @@
+
+```{r}
+data <- read_excel("E:/Pitts/ECON 2823 Applications of Economic Analy/percentages.xlsx")
+```
+
+```{r}
+N50 <- data[data$`N` == 50, ]
+```
+
+```{r}
+library(ggplot2)
+```
+
+
+```{r}
+plot50 <- ggplot(N50, aes(method, error_rate, fill = parameter, group = interaction(method, parameter, confidence_interval))) +
+  geom_bar(stat = "identity", position = position_dodge(width = 1)) +
+  theme_wsj() +
+  scale_fill_wsj("rgby", "") +
+  theme(axis.ticks.length = unit(0.5, 'cm')) +
+  guides(fill = guide_legend(title = NULL)) +
+  ggtitle("N = 50", 
+           subtitle = "Error Rate comparison") +  # 添加副标题
+  theme(axis.title = element_blank(), legend.position = 'none', 
+        axis.text.x = element_text(angle = 45, hjust = 1),  # 旋转X轴标签
+        plot.title = element_text(size = 12)) +  # 调整标题大小
+  facet_grid(. ~ parameter) +
+  geom_hline(yintercept = 0.05, color = "blue") +
+  geom_hline(yintercept = 0.1, color = "red") +
+  geom_hline(yintercept = 0.2, color = "orange")
+
+plot50
+
+```
+```{r}
+N100 <- data[data$`N` == 100, ]
+```
+
+```{r}
+plot100 <- ggplot(N100, aes(method, error_rate, fill = parameter, group = interaction(method, parameter, confidence_interval))) +
+  geom_bar(stat = "identity", position = position_dodge(width = 1)) +
+  theme_wsj() +
+  scale_fill_wsj("rgby", "") +
+  theme(axis.ticks.length = unit(0.5, 'cm')) +
+  guides(fill = guide_legend(title = NULL)) +
+  ggtitle("N = 100", 
+           subtitle = "Error Rate comparison") +  # 添加副标题
+  theme(axis.title = element_blank(), legend.position = 'none', 
+        axis.text.x = element_text(angle = 45, hjust = 1),  # 旋转X轴标签
+        plot.title = element_text(size = 12)) +  # 调整标题大小
+  facet_grid(. ~ parameter) +
+  geom_hline(yintercept = 0.05, color = "blue") +
+  geom_hline(yintercept = 0.1, color = "red") +
+  geom_hline(yintercept = 0.2, color = "orange")
+
+plot100
+
+```
+```{r}
+N200 <- data[data$`N` == 200, ]
+```
+
+```{r}
+plot200 <- ggplot(N200, aes(method, error_rate, fill = parameter, group = interaction(method, parameter, confidence_interval))) +
+  geom_bar(stat = "identity", position = position_dodge(width = 1)) +
+  theme_wsj() +
+  scale_fill_wsj("rgby", "") +
+  theme(axis.ticks.length = unit(0.5, 'cm')) +
+  guides(fill = guide_legend(title = NULL)) +
+  ggtitle("N = 200", 
+           subtitle = "Error Rate comparison") +  # 添加副标题
+  theme(axis.title = element_blank(), legend.position = 'none', 
+        axis.text.x = element_text(angle = 45, hjust = 1),  # 旋转X轴标签
+        plot.title = element_text(size = 12)) +  # 调整标题大小
+  facet_grid(. ~ parameter) +
+  geom_hline(yintercept = 0.05, color = "blue") +
+  geom_hline(yintercept = 0.1, color = "red") +
+  geom_hline(yintercept = 0.2, color = "orange")
+plot200
+```
+
+```{r}
+N400 <- data[data$`N` == 400, ]
+```
+
+```{r}
+plot400 <- ggplot(N400, aes(method, error_rate, fill = parameter, group = interaction(method, parameter, confidence_interval))) +
+  geom_bar(stat = "identity", position = position_dodge(width = 1)) +
+  theme_wsj() +
+  scale_fill_wsj("rgby", "") +
+  theme(axis.ticks.length = unit(0.5, 'cm')) +
+  guides(fill = guide_legend(title = NULL)) +
+  ggtitle("N = 400", 
+           subtitle = "Error Rate comparison") +  # 添加副标题
+  theme(axis.title = element_blank(), legend.position = 'none', 
+        axis.text.x = element_text(angle = 45, hjust = 1),  # 旋转X轴标签
+        plot.title = element_text(size = 12)) +  # 调整标题大小
+  facet_grid(. ~ parameter) +
+  geom_hline(yintercept = 0.05, color = "blue") +
+  geom_hline(yintercept = 0.1, color = "red") +
+  geom_hline(yintercept = 0.2, color = "orange")
+plot400
+```
+
+```{r}
+N800 <- data[data$`N` == 800, ]
+```
+
+```{r}
+plot800 <- ggplot(N800, aes(method, error_rate, fill = parameter, group = interaction(method, parameter, confidence_interval))) +
+  geom_bar(stat = "identity", position = position_dodge(width = 1)) +
+  theme_wsj() +
+  scale_fill_wsj("rgby", "") +
+  theme(axis.ticks.length = unit(0.5, 'cm')) +
+  guides(fill = guide_legend(title = NULL)) +
+  ggtitle("N = 800", 
+           subtitle = "Error Rate comparison") +  # 添加副标题
+  theme(axis.title = element_blank(), legend.position = 'none', 
+        axis.text.x = element_text(angle = 45, hjust = 1),  # 旋转X轴标签
+        plot.title = element_text(size = 12)) +  # 调整标题大小
+  facet_grid(. ~ parameter) +
+  geom_hline(yintercept = 0.05, color = "blue") +
+  geom_hline(yintercept = 0.1, color = "red") +
+  geom_hline(yintercept = 0.2, color = "orange")
+plot800
+```
+
+```{r}
+N1600 <- data[data$`N` == 1600, ]
+```
+
+```{r}
+plot1600 <- ggplot(N1600, aes(method, error_rate, fill = parameter, group = interaction(method, parameter, confidence_interval))) +
+  geom_bar(stat = "identity", position = position_dodge(width = 1)) +
+  theme_wsj() +
+  scale_fill_wsj("rgby", "") +
+  theme(axis.ticks.length = unit(0.5, 'cm')) +
+  guides(fill = guide_legend(title = NULL)) +
+  ggtitle("N = 1600", 
+           subtitle = "Error Rate comparison") +  # 添加副标题
+  theme(axis.title = element_blank(), legend.position = 'none', 
+        axis.text.x = element_text(angle = 45, hjust = 1),  # 旋转X轴标签
+        plot.title = element_text(size = 12)) +  # 调整标题大小
+  facet_grid(. ~ parameter) +
+  geom_hline(yintercept = 0.05, color = "blue") +
+  geom_hline(yintercept = 0.1, color = "red") +
+  geom_hline(yintercept = 0.2, color = "orange")
+plot1600
+```
+
+```{r}
+install.packages("treemapify")
+```
+
+
+```{r}
+library(treemapify)
+
+ggplot(data, aes(
+  subgroup = N, 
+  fill = interaction(method), 
+  area = error_rate)) +
+  geom_treemap(
+    color="white", size=0.5*.pt, alpha=NA) +
+  geom_treemap_subgroup_text(
+    place = "center", alpha = 0.5, grow = TRUE) + 
+  geom_treemap_text(mapping = aes(
+    label = error_rate), 
+    color = "white",
+    place = "center", grow = FALSE) +
+  guides(fill = "none")
+```
+```{r}
+ggplot(data, aes(
+  subgroup = N, 
+  fill = interaction(method), 
+  area = error_rate)) +
+  geom_treemap(
+    color="white", size=0.5*.pt, alpha=NA) +
+  geom_treemap_subgroup_text(
+    aes(label = method),
+    place = "center", alpha = 0.5, grow = TRUE) +  # 添加method标签
+  geom_treemap_text(mapping = aes(
+    label = error_rate), 
+    color = "white",
+    place = "center", grow = FALSE) +
+  guides(fill = "none")
+
+```
+
+```{r}
+ggplot(data, aes(x = N, y = error_rate, color = method, linetype = parameter)) +
+  geom_line() +
+  labs(title = "Error Rate", x = "N", y = "Error Rate", color = "Method", linetype = "Parameter") +
+  theme_minimal()
+```
+
+
+```{r}
+ggplot(data, aes(x = N, y = error_rate, color = parameter, linetype = method)) +
+  geom_line(size = 0.8) +  # 增加线宽
+  geom_point(size = 1.5) +  # 增加点标记
+  labs(title = "Type 1 Error Rate", x = "Sample Size N", y = "Error Rate", color = "Method", linetype = "Parameter", shape = "Parameter") +
+  theme_wsj() +
+  scale_fill_wsj("rgby", "") +
+  theme(axis.ticks.length = unit(0.5, 'cm'))  +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),  # 调整标题大小和样式
+    axis.title = element_text(size = 14),  # 调整轴标题大小
+    legend.title = element_text(size = 12),  # 调整图例标题大小
+    legend.text = element_text(size = 10)  # 调整图例文本大小
+  )
+```
+
+
+```{r}
+ggplot(data, aes(x = N, y = error_rate, color = method, linetype = parameter)) +
+  geom_line(size = 0.8) +  # 增加线宽
+  geom_point(size = 2) +  # 增加点标记
+  labs(title = "Error Rate", x = "N", y = "Error Rate", color = "Method", linetype = "Parameter") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),  # 调整标题大小和样式
+    axis.title = element_text(size = 14),  # 调整轴标题大小
+    legend.title = element_text(size = 12),  # 调整图例标题大小
+    legend.text = element_text(size = 10) +
+    scale_shape_manual(values = c("Beta_0" = 1, "Beta_1" = 2, "Beta_2" = 3)) # 调整图例文本大小
+  )
+```
+
+
+
+```{r}
+ggplot(N50, aes(x = parameter, y = gap)) +
+  geom_line() +  # 添加折线
+  labs(x = "X轴标签", y = "Y轴标签", title = "单折线图") +  # 添加轴标签和标题
+  theme_minimal()  # 使用最小化的主题风格
+```
+
+```{r}
+ggplot(data, aes(x = parameter, y = gap, color = method)) +  # 使用颜色分类
+# ggplot(N50, aes(x = parameter, y = gap, linetype = method)) +  # 使用线型分类
+  geom_line() +  
+  labs(x = "X轴标签", y = "Y轴标签", title = "单折线图") +  
+  theme_minimal()  
+```
+
+```{r}
+# 根据N和method对gap列中最接近0的数字进行分类
+closest_to_zero <- data %>%
+  group_by(N, method) %>%
+  summarize(closest_to_zero = gap[which.min(abs(gap))])
+
+# 输出结果
+print(closest_to_zero)
+```
+```{r}
+# 绘制点图
+ggplot(closest_to_zero, aes(x = N, y = closest_to_zero, color = method)) +
+  geom_point(size = 3) +
+  labs(x = "N", y = "Closest to Zero", color = "Method") +
+  ggtitle("Closest Value to Zero by N and Method")
+```
+```{r}
+Beta_0 <- data[data$`parameter` == "Beta_0", ]
+```
+
+```{r}
+ggplot(Beta_0, aes(x = N, y = percentages, color = method)) +
+  geom_line(size = 0.8) +  # 增加线宽
+  geom_point(size = 1.5) +  # 增加点标记
+  labs(title = "Type 1 Error Rate for Beta_0", x = "Sample Size N", y = "Error Rate", color = "Method") +
+  theme_wsj() +
+  scale_fill_wsj("rgby", "") +
+  theme(axis.ticks.length = unit(0.5, 'cm'))  +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),  # 调整标题大小和样式
+    axis.title = element_text(size = 14),  # 调整轴标题大小
+    legend.title = element_text(size = 12),  # 调整图例标题大小
+    legend.text = element_text(size = 10)  # 调整图例文本大小
+  )
+```
+
+
+```{r}
+Beta_1 <- data[data$`parameter` == "Beta_1", ]
+```
+
+```{r}
+ggplot(Beta_1, aes(x = N, y = error_rate,  color = method)) +
+  geom_line(size = 0.8) +  # 增加线宽
+  geom_point(size = 1.5) +  # 增加点标记
+  labs(title = "Type 1 Error Rate for Beta_1", x = "Sample Size N", y = "Error Rate", color = "Method") +
+  theme_wsj() +
+  scale_fill_wsj("rgby", "") +
+  theme(axis.ticks.length = unit(0.5, 'cm'))  +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),  # 调整标题大小和样式
+    axis.title = element_text(size = 14),  # 调整轴标题大小
+    legend.title = element_text(size = 12),  # 调整图例标题大小
+    legend.text = element_text(size = 10)  # 调整图例文本大小
+  )
+```
+
+```{r}
+Beta_2 <- data[data$`parameter` == "Beta_2", ]
+```
+
+```{r}
+ggplot(Beta_2, aes(x = N, y = error_rate, color = method)) +
+  geom_line(size = 0.8) +  # 增加线宽
+  geom_point(size = 1.5) +  # 增加点标记
+  labs(title = "Type 1 Error Rate for Beta_2", x = "Sample Size N", y = "Error Rate", color = "Method") +
+  theme_wsj() +
+  scale_fill_wsj("rgby", "") +
+  theme(axis.ticks.length = unit(0.5, 'cm'))  +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),  # 调整标题大小和样式
+    axis.title = element_text(size = 14),  # 调整轴标题大小
+    legend.title = element_text(size = 12),  # 调整图例标题大小
+    legend.text = element_text(size = 10)  # 调整图例文本大小
+  )
+```
+
+
+
+
+
+

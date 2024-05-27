@@ -1,0 +1,1021 @@
+---
+title: "assignment2"
+output: html_document
+date: "2024-03-30"
+---
+#### line 515 change N = 200, 400
+#### R = 2000
+#### iterations = 1500
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(ggplot2)
+ library(boot)
+ set.seed(123)  # You can replace 123 with any integer value you like
+```
+
+```{r}
+
+#STEP 1
+
+# Set the number of data points to 100 (THIS IS THE THING WE HAVE TO CHANGE to 50 , 100, 200, 400, 800, 1600)
+Ndata <- 100
+
+# Create a dummy variable Delta1 with 60% chance of being 1 and 40% chance of being 0
+Delta1 <- ifelse(runif(Ndata) < 0.6, 1, 0)
+
+#Create X2 based on the value of Delta
+X2 <- ifelse(Delta1 == 1, rchisq(Ndata, df = 4), rchisq(Ndata, df = 2))
+
+#Set the true parameters
+beta <- c(-1, -1, 1/2)
+
+# Calculate the mean parameter lambda for the Poisson distribution (The Function)
+lambda <- exp(beta[1] + beta[2]*Delta1 + beta[3]*X2)
+
+# Define a function to generate random Poisson-distributed numbers (Generate poisson values based of lambda)
+generateY <- function(lambda.i) rpois(1, lambda = lambda.i) 
+
+# Generate the dependent variable y based on lambda values (Create y vector)
+y <- sapply(lambda, generateY)
+
+
+# Create a data frame with simulated data (store y and the 2 predictors (Delta1 and X2))
+data.Pois <- data.frame(
+  "y" = y,  # Y
+  "Delta1" = ifelse(Delta1 == 1, TRUE, FALSE),  # Delta 1
+  "X2" = X2 # X2
+)
+
+# Display the first few rows of the data frame
+data.Pois
+
+```
+
+```{r}
+
+#Use GLM function (STEP 2) 
+glm.output <- glm( y ~ Delta1 + X2, data=data.Pois, family="poisson")
+summary( glm.output )
+
+#Extract betas from the model
+beta.hat <- coef(glm.output)
+beta.hat
+
+intercept_matrix <- matrix(NA, nrow = 1, ncol = 2)
+delta1_matrix <- matrix(NA, nrow = 1, ncol = 2)
+x2_matrix <- matrix(NA, nrow = 1, ncol = 2)
+
+
+#Get the CI for the betas
+
+#Get the Confidence interval for the parameters(95%) 
+delta95 <- confint(glm.output)
+
+    intercept_matrix[1,] <- delta95[1,]
+    delta1_matrix[1,] <- delta95[2,]
+    x2_matrix[1,] <- delta95[3,]
+
+#Get the Confidence Interval for the parameters (90%)
+delta90 <- confint(glm.output, level = 0.90)
+
+#Get the Confidence Interval forthe parameters (80%)
+delta80 <- confint(glm.output, level = 0.80)
+
+#Get the variance-covariance matrix (will be used later)
+Sigma.hat.divN <- vcov(glm.output)
+Sigma.hat.divN
+
+#We have the coefficients from the GLM and their CIs
+#We have CI before transformation and before bootstrap
+
+```
+
+```{r}
+
+#Create the  transformation that measures the idea that the Poisson variable is less than 2 (so equal to 0 or 1)
+
+#Use the numerical derivative function from class
+numerical.derivative <- function(fun, x) {
+    nn <- length(x)  # Set nn as the length of input vector x
+    dx <- rep(NaN, nn)  # Initialize the derivative vector
+    for (i in 1:nn) {
+        eps <- rep(0, nn)  # Set epsilon as a zero vector (0,0,..,0)
+        eps[i] <- 1e-6  # Put a small shift on coordinate i
+        # Now calculate the derivative using centered difference method
+        dx[i] <- (fun(x + eps) - fun(x - eps)) / (2e-6)
+    }
+    return(dx)  # Return the numerical derivative vector
+}
+
+#Create a function that return the probability of Poisson variable being 0 or 1 with Delta1 being 1 and X2 being 4
+prob.pois<- function(beta) {
+    lambda <- exp(beta[1] + beta[2]*1 + beta[3]*4)
+    p_0 <- dpois(0, lambda)
+    p_1 <- dpois(1, lambda)
+    p <- p_0 + p_1
+    return(p)
+}            
+            
+
+#Probability if being 0 or 1 separate (ask prof)
+#prob.pois.0 <-  function( beta ) dpois(0,lambda=exp(beta[1] + beta[2]*1 + beta[3]*4) )
+
+#prob.pois.1 <-  function( beta ) dpois(1,lambda=exp(beta[1] + beta[2]*1 + beta[3]*4) )
+
+
+#Get the derivative for the points in the probability based on the beta hat points (for the DELTA METHOD)
+dG <- numerical.derivative(prob.pois,beta.hat) # use our vector numerical diff function on it
+dG
+
+
+
+```
+
+```{r}
+
+#Get the estimated Omega
+Omega.hat <- t(dG)%*% Sigma.hat.divN %*% dG
+Omega.hat
+
+
+#Check the probability of poisson lower than 2 based on the conditions
+prob.pois(beta)
+
+
+#Check the probability of poisson lower than 2 based on the conditions
+prob.pois(beta.hat)
+
+#Square root of Omega Hat (For the Delta Method right below)
+sqrt(Omega.hat)
+
+
+
+```
+
+```{r}
+
+
+# #Implement the Delta Method (only 95% CI)
+# delta.method.out<- c("estimate of zero or 1"=prob.pois(beta.hat), 
+#                       "std.err"= sqrt(Omega.hat), 
+#                       "lower.conf"= prob.pois(beta.hat)-1.96*sqrt(Omega.hat),
+#                       "upper.conf"= prob.pois(beta.hat)+1.96*sqrt(Omega.hat) )
+# delta.method.out
+
+
+# Implement the Delta Method for 95% confidence interval
+lower_95 <- prob.pois(beta.hat) - 1.96 * sqrt(Omega.hat)
+upper_95 <- prob.pois(beta.hat) + 1.96 * sqrt(Omega.hat)
+
+# Implement the Delta Method for 90% confidence interval
+lower_90 <- prob.pois(beta.hat) - 1.65 * sqrt(Omega.hat)
+upper_90 <- prob.pois(beta.hat) + 1.65 * sqrt(Omega.hat)
+
+# Implement the Delta Method for 80% confidence interval
+lower_80 <- prob.pois(beta.hat) - 1.28 * sqrt(Omega.hat)
+upper_80 <- prob.pois(beta.hat) + 1.28 * sqrt(Omega.hat)
+
+# Store the results
+delta.method.out <- c("estimate of 0 or 1" = prob.pois(beta.hat),
+                      "std.err"= sqrt(Omega.hat),
+
+                   "lower.conf95"=lower_95, # I set names FALSE here to stop quantile names being                                                                                        appended
+                   "upper.conf95"=upper_95,
+                   "lower.conf90"=lower_90, # I set names FALSE here to stop quantile names being                                                                                        appended
+                   "upper.conf90"=upper_90,
+                   "lower.conf80"=lower_80, # I set names FALSE here to stop quantile names being                                                                                        appended
+                   "upper.conf80"=upper_80)
+
+delta.method.out
+
+# Store the results in a dataframe
+probdelta <- data.frame(
+  Estimate = prob.pois(beta.hat),
+  Std_Err = sqrt(Omega.hat),
+  Lower_Conf_95 = lower_95,
+  Upper_Conf_95 = upper_95,
+  Lower_Conf_90 = lower_90,
+  Upper_Conf_90 = upper_90,
+  Lower_Conf_80 = lower_80,
+  Upper_Conf_80 = upper_80
+)
+
+
+
+```
+
+```{r Check  answer against simulation}
+
+#We create simulations to test our results
+#install.packages('MASS')
+library(MASS) # we need this to get the multivariate random normal distribution
+beta.draws <- replicate(5e5, # replicate things 50000 times
+                        prob.pois( #Figure out the Prob under a Poisson of a zero OR 1 outcome
+                            mvrnorm(1,mu=beta.hat,Sigma=Sigma.hat.divN) # Draw a value of beta hat from the asymptotic distribution
+                        )
+                       )
+
+#get the results of the simulatoin (mean standard error and CIS)
+simulation.out <-c("estimate of zero"=mean(beta.draws),
+                   "std.err"= sd(beta.draws),
+                   "lower.conf95"=quantile(beta.draws,0.025,names=FALSE), # I set names FALSE here to stop quantile names being                                                                                        appended
+                   "upper.conf95"=quantile(beta.draws,0.975,names=FALSE),
+                   "lower.conf90"=quantile(beta.draws,0.05,names=FALSE), # I set names FALSE here to stop quantile names being                                                                                        appended
+                   "upper.conf90"=quantile(beta.draws,0.95,names=FALSE),
+                   "lower.conf80"=quantile(beta.draws,0.1,names=FALSE), # I set names FALSE here to stop quantile names being                                                                                        appended
+                   "upper.conf80"=quantile(beta.draws,0.9,names=FALSE))
+simulation.out
+
+# Store the results in a dataframe
+probsim <- data.frame(
+  Estimate = mean(beta.draws),
+  Std_Err = sd(beta.draws),
+  Lower_Conf_95 = quantile(beta.draws, 0.025, names = FALSE),
+  Upper_Conf_95 = quantile(beta.draws, 0.975, names = FALSE),
+  Lower_Conf_90 = quantile(beta.draws, 0.05, names = FALSE),
+  Upper_Conf_90 = quantile(beta.draws, 0.95, names = FALSE),
+  Lower_Conf_80 = quantile(beta.draws, 0.1, names = FALSE),
+  Upper_Conf_80 = quantile(beta.draws, 0.9, names = FALSE)
+)
+
+```
+
+```{r}
+# round(# Rounding to 4 dp for clarity
+# cbind(simulation=simulation.out,delta.method=delta.method.out,difference=simulation.out-delta.method.out),4)
+
+
+```
+
+
+```{r}
+#Bootstrapping
+
+  library(boot)
+  
+  #Create the boostrapping poison function
+  pois.bs <- function(formula, data, indices) {
+    d <- data[indices,]
+    pois.fit <- glm(formula, data=d,family="poisson")
+    # Return the probability of a 0 or 1 when Delta1=1, and  x2=4
+    return( prob.pois(coef(pois.fit)) )  
+  }
+  
+  #Use boot and the function to get the results
+  bs.results.prob <- boot(data=data.Pois, statistic=pois.bs,
+     R=10000, formula=y~Delta1+X2)
+
+
+```
+
+```{r}
+
+#GRAPH
+bs.distribution <- bs.results.prob$t
+
+
+# Extract the column containing the bootstrap results
+bs_distribution <- bs.distribution[,1]
+
+# Plot histogram using ggplot2
+ggplot(data.frame(bs_distribution), aes(x = bs_distribution)) +
+  geom_histogram(aes(y = after_stat(density)), binwidth = 0.005, color = "blue", fill = "gold", linewidth = 2) +
+  xlab("Outcome Prob") +
+  ylab("Density")
+
+
+
+
+```
+
+```{r}
+
+#CONFIDENCE INTERVALS FOR BOOSTRAPPING
+bootstrap.out <-c("estimate"=mean(bs.distribution),
+                   "std.err"= sd(bs.distribution),
+                   "lower.conf95"=quantile(bs.distribution,0.025,names=FALSE), # I set names FALSE here to stop quantile names being                                                                                        appended
+                   "upper.conf95"=quantile(bs.distribution,0.975,names=FALSE),
+                   "lower.conf90"=quantile(bs.distribution,0.05,names=FALSE), # I set names FALSE here to stop quantile names being                                                                                        appended
+                   "upper.conf90"=quantile(bs.distribution,0.95,names=FALSE),
+                   "lower.conf80"=quantile(bs.distribution,0.1,names=FALSE), # I set names FALSE here to stop quantile names being                                                                                        appended
+                   "upper.conf80"=quantile(bs.distribution,0.9,names=FALSE))
+
+bootstrap.out
+
+
+
+
+
+prob_bootstrap_df <- data.frame(
+  Estimate = numeric(3),
+  Std_Err = numeric(3),
+  Lower_Conf_95 = numeric(3),
+  Upper_Conf_95 = numeric(3),
+  Lower_Conf_90 = numeric(3),
+  Upper_Conf_90 = numeric(3),
+  Lower_Conf_80 = numeric(3),
+  Upper_Conf_80 = numeric(3)
+)
+
+# Loop through the calculations
+for (i in 1:3) {  # Replace `num_iterations` with the appropriate number of iterations
+  # Your calculations here
+  
+  # Store the results in the i-th row of the dataframe
+  prob_bootstrap_df[i, ] <- c(
+    Estimate = mean(bs.distribution),
+    Std_Err = sd(bs.distribution),
+    Lower_Conf_95 = quantile(bs.distribution, 0.025, names = FALSE),
+    Upper_Conf_95 = quantile(bs.distribution, 0.975, names = FALSE),
+    Lower_Conf_90 = quantile(bs.distribution, 0.05, names = FALSE),
+    Upper_Conf_90 = quantile(bs.distribution, 0.95, names = FALSE),
+    Lower_Conf_80 = quantile(bs.distribution, 0.1, names = FALSE),
+    Upper_Conf_80 = quantile(bs.distribution, 0.9, names = FALSE)
+  )
+}
+
+
+```
+
+```{r}
+
+
+
+#Check the probability of poisson lower than 2 based on the conditions
+prob.pois(beta)
+
+#COMPARISON OF PROBABILITIES
+#Compare estimates and confidence intervals for simulation, delta and bootstrap
+result_df <- round(
+    cbind(simulation=simulation.out,delta.method=delta.method.out,bootstrap=bootstrap.out),4)
+
+print(result_df)
+
+```
+
+```{r}
+
+#Use the bootstrap method to figure out the standard errors
+pois.bs <- function(formula, data, indices) {
+  d <- data[indices,]
+  pois.fit <- glm(formula, data=d,family="poisson")
+  # Return the coefficients of the glm model
+  return( coef(pois.fit) ) 
+}
+bs.results <- boot(data=data.Pois, statistic=pois.bs,R=1000, formula=y~Delta1+X2)
+
+bs.results
+
+#CI for Delta 1 (Confidence interval for the parameter Delta 1)
+boot.ci(bs.results,type="bca",index=2) #  Delta1
+
+#CI for X2      (Confidence interval for the parameter X2)
+boot.ci(bs.results,type="bca",index=3) #  X2
+
+#The bca here stands for adjusted bootstrap percentile method
+
+# Confidence intervals for Delta1 at different confidence levels
+BootDelta1s_95 <- boot.ci(bs.results, type = "bca", index = 2, conf = 0.95)
+BootDelta1s_90 <- boot.ci(bs.results, type = "bca", index = 2, conf = 0.90)
+BootDelta1s_80 <- boot.ci(bs.results, type = "bca", index = 2, conf = 0.80)
+
+# Confidence intervals for X2 at different confidence levels
+BootX2s_95 <- boot.ci(bs.results, type = "bca", index = 3, conf = 0.95)
+BootX2s_90 <- boot.ci(bs.results, type = "bca", index = 3, conf = 0.90)
+BootX2s_80 <- boot.ci(bs.results, type = "bca", index = 3, conf = 0.80)
+
+
+BootDelta1s_95_matrix <- matrix(NA, nrow = 1, ncol = 2)
+BootDelta1s_95_matrix[1, ] <- BootDelta1s_95$bca[4:5]
+
+BootDelta1s_90_matrix <- matrix(NA, nrow = 1, ncol = 2)
+BootDelta1s_90_matrix[1, ] <- BootDelta1s_90$bca[4:5]
+
+BootDelta1s_80_matrix <- matrix(NA, nrow = 1, ncol = 2)
+BootDelta1s_80_matrix[1, ] <- BootDelta1s_80$bca[4:5]
+
+BootX2s_95_matrix <- matrix(NA, nrow = 1, ncol = 2)
+BootX2s_95_matrix[1, ] <- BootX2s_95$bca[4:5]
+
+BootX2s_90_matrix <- matrix(NA, nrow = 1, ncol = 2)
+BootX2s_90_matrix[1, ] <- BootX2s_90$bca[4:5]
+
+BootX2s_80_matrix <- matrix(NA, nrow = 1, ncol = 2)
+BootX2s_80_matrix[1, ] <- BootX2s_80$bca[4:5]
+
+```
+
+
+```{r}
+
+#Get the variance-covariance matrix
+bs.Sigma <- cov( bs.results$t) # get the covariance matrix
+rownames(bs.Sigma) <- c("(Intercept)","Delta1","X2")
+colnames(bs.Sigma) <- c("(Intercept)","Delta1","X2")
+
+#Print Boostrap Variance-cov Matrix
+bs.Sigma # Matrix
+
+#The Var cov matrix we did way before (delta method)
+Sigma.hat.divN # Matrix
+
+
+#Compare s.e for both methods
+sqrt(diag(bs.Sigma)) # Std. Errors for each parameter in isolation bootstrap
+sqrt(diag(Sigma.hat.divN)) # Std. Errors for each parameter in isolation delta method
+
+
+```
+
+```{r}
+#433 FIRST PART OF THE CODE
+#LOOP with prob
+#Instead of making it loop for every number we have to use in the assignment
+#N = 50, 100, 200, 400, 800, 1600
+
+#We will just have the same code copy and pasted for each
+
+
+#N=50
+
+#STEP 1
+
+
+# Set the number of iterations (number of loops, this should be over a thousand)
+iterations <- 1000
+
+prob_bootstrap_df <- data.frame(
+  Estimate = numeric(iterations),
+  Std_Err = numeric(iterations),
+  Lower_Conf_95 = numeric(iterations),
+  Upper_Conf_95 = numeric(iterations),
+  Lower_Conf_90 = numeric(iterations),
+  Upper_Conf_90 = numeric(iterations),
+  Lower_Conf_80 = numeric(iterations),
+  Upper_Conf_80 = numeric(iterations)
+)
+
+prob_delta_df <- data.frame(
+  Estimate = numeric(iterations),
+  Std_Err = numeric(iterations),
+  Lower_Conf_95 = numeric(iterations),
+  Upper_Conf_95 = numeric(iterations),
+  Lower_Conf_90 = numeric(iterations),
+  Upper_Conf_90 = numeric(iterations),
+  Lower_Conf_80 = numeric(iterations),
+  Upper_Conf_80 = numeric(iterations)
+)
+
+prob_sim_df <- data.frame(
+  Estimate = numeric(iterations),
+  Std_Err = numeric(iterations),
+  Lower_Conf_95 = numeric(iterations),
+  Upper_Conf_95 = numeric(iterations),
+  Lower_Conf_90 = numeric(iterations),
+  Upper_Conf_90 = numeric(iterations),
+  Lower_Conf_80 = numeric(iterations),
+  Upper_Conf_80 = numeric(iterations)
+)
+
+
+
+
+BootDelta1s_95_matrix <- matrix(NA, nrow = iterations, ncol = 2)
+BootDelta1s_90_matrix <- matrix(NA, nrow = iterations, ncol = 2)
+BootDelta1s_80_matrix <- matrix(NA, nrow = iterations, ncol = 2)
+BootX2s_95_matrix <- matrix(NA, nrow = iterations, ncol = 2)
+BootX2s_90_matrix <- matrix(NA, nrow = iterations, ncol = 2)
+BootX2s_80_matrix <- matrix(NA, nrow = iterations, ncol = 2)
+
+BootIntercept_95_matrix <- matrix(NA, nrow = iterations, ncol = 2)
+BootIntercept_90_matrix <- matrix(NA, nrow = iterations, ncol = 2)
+BootIntercept_80_matrix <- matrix(NA, nrow = iterations, ncol = 2)
+
+
+intercept_matrix_95 <- matrix(NA, nrow = iterations, ncol = 2)
+delta1_matrix_95 <- matrix(NA, nrow = iterations, ncol = 2)
+x2_matrix_95 <- matrix(NA, nrow = iterations, ncol = 2)
+
+intercept_matrix_90 <- matrix(NA, nrow = iterations, ncol = 2)
+delta1_matrix_90 <- matrix(NA, nrow = iterations, ncol = 2)
+x2_matrix_90 <- matrix(NA, nrow = iterations, ncol = 2)
+
+intercept_matrix_80 <- matrix(NA, nrow = iterations, ncol = 2)
+delta1_matrix_80 <- matrix(NA, nrow = iterations, ncol = 2)
+x2_matrix_80 <- matrix(NA, nrow = iterations, ncol = 2)
+
+
+# Loop through the iterations
+for (i in 1:iterations) {
+
+# Set the number of data points to 100 
+Ndata <- 100
+
+# Create a dummy variable Delta1 with 60% chance of being 1 and 40% chance of being 0
+Delta1 <- ifelse(runif(Ndata) < 0.6, 1, 0)
+
+#Create X2 based on the value of Delta
+X2 <- ifelse(Delta1 == 1, rchisq(Ndata, df = 4), rchisq(Ndata, df = 2))
+
+#Set the true parameters
+beta <- c(-1, -1, 1/2)
+
+# Calculate the mean parameter lambda for the Poisson distribution (The Function)
+lambda <- exp(beta[1] + beta[2]*Delta1 + beta[3]*X2)
+
+# Define a function to generate random Poisson-distributed numbers (Generate poisson values based of lambda)
+generateY <- function(lambda.i) rpois(1, lambda = lambda.i) 
+
+# Generate the dependent variable y based on lambda values (Create y vector)
+y <- sapply(lambda, generateY)
+
+
+# Create a data frame with simulated data (store y and the 2 predictors (Delta1 and X2))
+data.Pois <- data.frame(
+  "y" = y,  # Y
+  "Delta1" = ifelse(Delta1 == 1, TRUE, FALSE),  # Delta 1
+  "X2" = X2 # X2
+)
+
+# Display the first few rows of the data frame
+data.Pois
+
+
+
+
+
+#Use GLM function (STEP 2) 
+glm.output <- glm( y ~ Delta1 + X2, data=data.Pois, family="poisson")
+summary( glm.output )
+
+#Extract betas from the model
+beta.hat <- coef(glm.output)
+beta.hat
+
+
+#Get the CI for the betas
+
+#Get the Confidence interval for the parameters(95%) 
+delta95 <- confint(glm.output)
+
+intercept_matrix_95[i,] <- delta95[1,]
+delta1_matrix_95[i,] <- delta95[2,]
+x2_matrix_95[i,] <- delta95[3,]
+
+#Get the Confidence Interval for the parameters (90%)
+delta90 <- confint(glm.output, level = 0.90)
+
+intercept_matrix_90[i,] <- delta90[1,]
+delta1_matrix_90[i,] <- delta90[2,]
+x2_matrix_90[i,] <- delta90[3,]
+
+#Get the Confidence Interval forthe parameters (80%)
+delta80 <- confint(glm.output, level = 0.80)
+
+intercept_matrix_80[i,] <- delta80[1,]
+delta1_matrix_80[i,] <- delta80[2,]
+x2_matrix_80[i,] <- delta80[3,]
+
+
+#Get the variance-covariance matrix (will be used later)
+Sigma.hat.divN <- vcov(glm.output)
+Sigma.hat.divN
+
+#We have the coefficients from the GLM and their CIs
+#We have CI before transformation and before bootstrap
+
+
+#Create the  transformation that measures the idea that the Poisson variable is less than 2 (so equal to 0 or 1)
+
+#Use the numerical derivative function from class
+numerical.derivative <- function(fun, x) {
+    nn <- length(x)  # Set nn as the length of input vector x
+    dx <- rep(NaN, nn)  # Initialize the derivative vector
+    for (i in 1:nn) {
+        eps <- rep(0, nn)  # Set epsilon as a zero vector (0,0,..,0)
+        eps[i] <- 1e-6  # Put a small shift on coordinate i
+        # Now calculate the derivative using centered difference method
+        dx[i] <- (fun(x + eps) - fun(x - eps)) / (2e-6)
+    }
+    return(dx)  # Return the numerical derivative vector
+}
+
+#Create a function that return the probability of Poisson variable being 0 or 1 with Delta1 being 1 and X2 being 4
+prob.pois<- function(beta) {
+    lambda <- exp(beta[1] + beta[2]*1 + beta[3]*4)
+    p_0 <- dpois(0, lambda)
+    p_1 <- dpois(1, lambda)
+    p <- p_0 + p_1
+    return(p)
+}            
+            
+
+#Probability if being 0 or 1 separate (ask prof)
+#prob.pois.0 <-  function( beta ) dpois(0,lambda=exp(beta[1] + beta[2]*1 + beta[3]*4) )
+
+#prob.pois.1 <-  function( beta ) dpois(1,lambda=exp(beta[1] + beta[2]*1 + beta[3]*4) )
+
+
+#Get the derivative for the points in the probability based on the beta hat points (for the DELTA METHOD)
+dG <- numerical.derivative(prob.pois,beta.hat) # use our vector numerical diff function on it
+dG
+
+
+
+
+#Get the estimated Omega
+Omega.hat <- t(dG)%*% Sigma.hat.divN %*% dG
+Omega.hat
+
+#Check the probability of poisson lower than 2 based on the conditions
+prob.pois(beta.hat)
+
+#Square root of Omega Hat (For the Delta Method right below)
+sqrt(Omega.hat)
+
+
+
+# #Implement the Delta Method (only 95% CI)
+# delta.method.out<- c("estimate of zero or 1"=prob.pois(beta.hat), 
+#                       "std.err"= sqrt(Omega.hat), 
+#                       "lower.conf"= prob.pois(beta.hat)-1.96*sqrt(Omega.hat),
+#                       "upper.conf"= prob.pois(beta.hat)+1.96*sqrt(Omega.hat) )
+# delta.method.out
+
+
+# Implement the Delta Method for 95% confidence interval
+lower_95 <- prob.pois(beta.hat) - 1.96 * sqrt(Omega.hat)
+upper_95 <- prob.pois(beta.hat) + 1.96 * sqrt(Omega.hat)
+
+# Implement the Delta Method for 90% confidence interval
+lower_90 <- prob.pois(beta.hat) - 1.65 * sqrt(Omega.hat)
+upper_90 <- prob.pois(beta.hat) + 1.65 * sqrt(Omega.hat)
+
+# Implement the Delta Method for 80% confidence interval
+lower_80 <- prob.pois(beta.hat) - 1.28 * sqrt(Omega.hat)
+upper_80 <- prob.pois(beta.hat) + 1.28 * sqrt(Omega.hat)
+
+# Store the results
+delta.method.out <- c("estimate of 0 or 1" = prob.pois(beta.hat),
+                      "std.err"= sqrt(Omega.hat),
+
+                   "lower.conf95"=lower_95, # I set names FALSE here to stop quantile names being                                                                                        appended
+                   "upper.conf95"=upper_95,
+                   "lower.conf90"=lower_90, # I set names FALSE here to stop quantile names being                                                                                        appended
+                   "upper.conf90"=upper_90,
+                   "lower.conf80"=lower_80, # I set names FALSE here to stop quantile names being                                                                                        appended
+                   "upper.conf80"=upper_80)
+
+delta.method.out
+
+
+
+  # Store the results in the i-th row of the dataframe
+  prob_delta_df[i, ] <- c(
+  Estimate = prob.pois(beta.hat),
+  Std_Err = sqrt(Omega.hat),
+  Lower_Conf_95 = lower_95,
+  Upper_Conf_95 = upper_95,
+  Lower_Conf_90 = lower_90,
+  Upper_Conf_90 = upper_90,
+  Lower_Conf_80 = lower_80,
+  Upper_Conf_80 = upper_80
+  )
+
+
+
+
+
+
+
+#BOOSTRAPPING
+
+ 
+  
+  #Create the boostrapping poison function
+  pois.bs <- function(formula, data, indices) {
+    d <- data[indices,]
+    pois.fit <- glm(formula, data=d,family="poisson")
+    # Return the probability of a 0 or 1 when Delta1=1, and  x2=4
+    return( prob.pois(coef(pois.fit)) )  
+  }
+  
+  #Use boot and the function to get the results
+  bs.results.prob <- boot(data=data.Pois, statistic=pois.bs,
+     R=1000, formula=y~Delta1+X2)
+  
+bs.distribution <- bs.results.prob$t
+
+
+# Extract the column containing the bootstrap results
+bs_distribution <- bs.distribution[,1]
+  
+#CONFIDENCE INTERVALS FOR BOOSTRAPPING
+bootstrap.out <-c("estimate"=mean(bs.distribution),
+                   "std.err"= sd(bs.distribution),
+                   "lower.conf95"=quantile(bs.distribution,0.025,names=FALSE), # I set names FALSE here to stop quantile names being                                                                                        appended
+                   "upper.conf95"=quantile(bs.distribution,0.975,names=FALSE),
+                   "lower.conf90"=quantile(bs.distribution,0.05,names=FALSE), # I set names FALSE here to stop quantile names being                                                                                        appended
+                   "upper.conf90"=quantile(bs.distribution,0.95,names=FALSE),
+                   "lower.conf80"=quantile(bs.distribution,0.1,names=FALSE), # I set names FALSE here to stop quantile names being                                                                                        appended
+                   "upper.conf80"=quantile(bs.distribution,0.9,names=FALSE))
+
+bootstrap.out
+
+
+  prob_bootstrap_df[i, ] <- c(
+    Estimate = mean(bs.distribution),
+    Std_Err = sd(bs.distribution),
+    Lower_Conf_95 = quantile(bs.distribution, 0.025, names = FALSE),
+    Upper_Conf_95 = quantile(bs.distribution, 0.975, names = FALSE),
+    Lower_Conf_90 = quantile(bs.distribution, 0.05, names = FALSE),
+    Upper_Conf_90 = quantile(bs.distribution, 0.95, names = FALSE),
+    Lower_Conf_80 = quantile(bs.distribution, 0.1, names = FALSE),
+    Upper_Conf_80 = quantile(bs.distribution, 0.9, names = FALSE)
+  )
+
+
+
+#Compare estimates and confidence intervals for simulation, delta and bootstrap
+round(
+    cbind(simulation=simulation.out,delta.method=delta.method.out,bootstrap=bootstrap.out),4)
+
+
+
+#Use the bootstrap method to figure out the standard errors
+pois.bs <- function(formula, data, indices) {
+  d <- data[indices,]
+  pois.fit <- glm(formula, data=d,family="poisson")
+  # Return the coefficients of the glm model
+  return( coef(pois.fit) ) 
+}
+bs.results <- boot(data=data.Pois, statistic=pois.bs,R=1000, formula=y~Delta1+X2)
+
+bs.results
+
+#CI for Delta 1 (Confidence interval for the parameter Delta 1)
+boot.ci(bs.results,type="bca",index=2) #  Delta1
+
+#CI for X2      (Confidence interval for the parameter X2)
+boot.ci(bs.results,type="bca",index=3) #  X2
+
+#The bca here stands for adjusted bootstrap percentile method
+
+
+# Confidence intervals for intercept at different confidence levels
+BootIntercept_95 <- boot.ci(bs.results, type = "bca", index = 1, conf = 0.95)
+BootIntercept_90 <- boot.ci(bs.results, type = "bca", index = 1, conf = 0.90)
+BootIntercept_80 <- boot.ci(bs.results, type = "bca", index = 1, conf = 0.80)
+    
+
+
+# Confidence intervals for Delta1 at different confidence levels
+BootDelta1s_95 <- boot.ci(bs.results, type = "bca", index = 2, conf = 0.95)
+BootDelta1s_90 <- boot.ci(bs.results, type = "bca", index = 2, conf = 0.90)
+BootDelta1s_80 <- boot.ci(bs.results, type = "bca", index = 2, conf = 0.80)
+
+# Confidence intervals for X2 at different confidence levels
+BootX2s_95 <- boot.ci(bs.results, type = "bca", index = 3, conf = 0.95)
+BootX2s_90 <- boot.ci(bs.results, type = "bca", index = 3, conf = 0.90)
+BootX2s_80 <- boot.ci(bs.results, type = "bca", index = 3, conf = 0.80)
+
+
+
+
+
+BootDelta1s_95_matrix[i, ] <- BootDelta1s_95$bca[4:5]
+BootDelta1s_90_matrix[i, ] <- BootDelta1s_90$bca[4:5]
+BootDelta1s_80_matrix[i, ] <- BootDelta1s_80$bca[4:5]
+
+BootX2s_95_matrix[i, ] <- BootX2s_95$bca[4:5]
+BootX2s_90_matrix[i, ] <- BootX2s_90$bca[4:5]
+BootX2s_80_matrix[i, ] <- BootX2s_80$bca[4:5]
+
+BootIntercept_95_matrix[i, ] <- BootIntercept_95$bca[4:5]
+BootIntercept_90_matrix[i, ] <- BootIntercept_90$bca[4:5]
+BootIntercept_80_matrix[i, ] <- BootIntercept_80$bca[4:5]
+
+
+
+#Get the variance-covariance matrix
+bs.Sigma <- cov( bs.results$t) # get the covariance matrix
+rownames(bs.Sigma) <- c("(Intercept)","Delta1","X2")
+colnames(bs.Sigma) <- c("(Intercept)","Delta1","X2")
+
+#Print Boostrap Variance-cov Matrix
+bs.Sigma # Matrix
+
+#The Var cov matrix we did way before (delta method)
+Sigma.hat.divN # Matrix
+
+
+#Compare s.e for both methods
+sqrt(diag(bs.Sigma)) # Std. Errors for each parameter in isolation bootstrap
+sqrt(diag(Sigma.hat.divN)) # Std. Errors for each parameter in isolation delta method
+
+}
+
+
+
+
+```
+
+```{r}
+
+#827 SECOND PART OF THE CODE
+#Tables for N=50
+
+#Now that we have matrices for the CI for the parameters, we can compare them with the actual values
+
+#TRUE PARAMETER VALUES
+beta <- c(-1, -1, 1/2)
+
+#INTERCEPT MATRICES
+
+#Delta
+#intercept_matrix_95
+#intercept_matrix_90
+#intercept_matrix_80
+
+#Boostrap
+#BootIntercept_95_matrix
+#BootIntercept_90_matrix
+#BootIntercept_80_matrix
+
+
+
+#Delta1 MATRICES
+
+#Delta
+#delta1_matrix_95
+#delta1_matrix_90
+#delta1_matrix_80
+
+#Boostrap
+#BootDelta1s_95_matrix
+#BootDelta1s_90_matrix
+#BootDelta1s_80_matrix
+
+
+#X2 MATRICES
+
+#Delta
+#x2_matrix_95
+#x2_matrix_90
+#x2_matrix_80
+
+#Boostrap
+#BootX2s_95_matrix
+#BootX2s_90_matrix
+#BootX2s_80_matrix
+
+
+
+# Function to calculate the percentage of rows where -1 is within the bounds defined by the second column
+calculate_percentage <- function(matrix) {
+    count <- sum(matrix[, 1] <= -1 & matrix[, 2] >= -1)
+    total_rows <- nrow(matrix)
+    percentage <- count / total_rows * 100
+    return(percentage)
+}
+
+percentage_intercept_95 <- calculate_percentage(intercept_matrix_95)
+percentage_intercept_90 <- calculate_percentage(intercept_matrix_90)
+percentage_intercept_80 <- calculate_percentage(intercept_matrix_80)
+
+percentage_boot_95 <- calculate_percentage(BootIntercept_95_matrix)
+percentage_boot_90 <- calculate_percentage(BootIntercept_90_matrix)
+percentage_boot_80 <- calculate_percentage(BootIntercept_80_matrix)
+
+# Print the percentages
+cat("Percentage of rows where -1 is within the bounds for intercept_matrix_95:", percentage_intercept_95, "%\n")
+cat("Percentage of rows where -1 is within the bounds for intercept_matrix_90:", percentage_intercept_90, "%\n")
+cat("Percentage of rows where -1 is within the bounds for intercept_matrix_80:", percentage_intercept_80, "%\n")
+cat("Percentage of rows where -1 is within the bounds for BootIntercept_95_matrix:", percentage_boot_95, "%\n")
+cat("Percentage of rows where -1 is within the bounds for BootIntercept_90_matrix:", percentage_boot_90, "%\n")
+cat("Percentage of rows where -1 is within the bounds for BootIntercept_80_matrix:", percentage_boot_80, "%\n")
+
+
+calculate_percentage2 <- function(matrix) {
+    count <- sum(matrix[, 1] <= -1 & matrix[, 2] >= -1)
+    total_rows <- nrow(matrix)
+    percentage <- count / total_rows * 100
+    return(percentage)
+}
+
+# Calculate the percentage for each matrix
+percentage_delta1_95 <- calculate_percentage2(delta1_matrix_95)
+percentage_delta1_90 <- calculate_percentage2(delta1_matrix_90)
+percentage_delta1_80 <- calculate_percentage2(delta1_matrix_80)
+
+percentage_boot_delta1_95 <- calculate_percentage2(BootDelta1s_95_matrix)
+percentage_boot_delta1_90 <- calculate_percentage2(BootDelta1s_90_matrix)
+percentage_boot_delta1_80 <- calculate_percentage2(BootDelta1s_80_matrix)
+
+# Print the percentages
+cat("Percentage of rows where -1 is within the bounds for delta1_matrix_95:", percentage_delta1_95, "%\n")
+cat("Percentage of rows where -1 is within the bounds for delta1_matrix_90:", percentage_delta1_90, "%\n")
+cat("Percentage of rows where -1 is within the bounds for delta1_matrix_80:", percentage_delta1_80, "%\n")
+cat("Percentage of rows where -1 is within the bounds for BootDelta1s_95_matrix:", percentage_boot_delta1_95, "%\n")
+cat("Percentage of rows where -1 is within the bounds for BootDelta1s_90_matrix:", percentage_boot_delta1_90, "%\n")
+cat("Percentage of rows where -1 is within the bounds for BootDelta1s_80_matrix:", percentage_boot_delta1_80, "%\n")
+
+
+calculate_percentage3 <- function(matrix) {
+    count <- sum(matrix[, 1] <= 0.5 & matrix[, 2] >= 0.5)
+    total_rows <- nrow(matrix)
+    percentage <- count / total_rows * 100
+    return(percentage)
+}
+
+# Calculate the percentage for each matrix
+percentage_x2_95 <- calculate_percentage3(x2_matrix_95)
+percentage_x2_90 <- calculate_percentage3(x2_matrix_90)
+percentage_x2_80 <- calculate_percentage3(x2_matrix_80)
+
+percentage_boot_x2_95 <- calculate_percentage3(BootX2s_95_matrix)
+percentage_boot_x2_90 <- calculate_percentage3(BootX2s_90_matrix)
+percentage_boot_x2_80 <- calculate_percentage3(BootX2s_80_matrix)
+
+# Print the percentages
+cat("Percentage of rows where -1 is within the bounds for x2_matrix_95:", percentage_x2_95, "%\n")
+cat("Percentage of rows where -1 is within the bounds for x2_matrix_90:", percentage_x2_90, "%\n")
+cat("Percentage of rows where -1 is within the bounds for x2_matrix_80:", percentage_x2_80, "%\n")
+cat("Percentage of rows where -1 is within the bounds for BootX2s_95_matrix:", percentage_boot_x2_95, "%\n")
+cat("Percentage of rows where -1 is within the bounds for BootX2s_90_matrix:", percentage_boot_x2_90, "%\n")
+cat("Percentage of rows where -1 is within the bounds for BootX2s_80_matrix:", percentage_boot_x2_80, "%\n")
+
+
+
+
+
+
+prob.pois(beta)
+
+# Assuming prob.pois(beta) is a single value, not changing over iterations
+value <- prob.pois(beta)
+
+# Add the "value" column to prob_bootstrap_df with the same value for each row
+prob_bootstrap_df$value <- value
+
+
+# Add the "value" column to prob_bootstrap_df with the same value for each row
+prob_delta_df$value <- value
+
+# Calculate the number of times Value falls within the 95% confidence interval
+coverage_count_95 <- sum(prob_bootstrap_df$value >= prob_bootstrap_df$Lower_Conf_95 & 
+                         prob_bootstrap_df$value <= prob_bootstrap_df$Upper_Conf_95)
+
+# Calculate the number of times Value falls within the 90% confidence interval
+coverage_count_90 <- sum(prob_bootstrap_df$value >= prob_bootstrap_df$Lower_Conf_90 & 
+                         prob_bootstrap_df$value <= prob_bootstrap_df$Upper_Conf_90)
+
+# Calculate the number of times Value falls within the 85% confidence interval
+coverage_count_80 <- sum(prob_bootstrap_df$value >= prob_bootstrap_df$Lower_Conf_80 & 
+                         prob_bootstrap_df$value <= prob_bootstrap_df$Upper_Conf_80)
+
+# Calculate the total number of rows in the dataframe
+total_rows <- nrow(prob_bootstrap_df)
+
+# Calculate the percentage of times Value falls within each confidence interval
+coverage_percentage_95 <- (coverage_count_95 / total_rows) * 100
+coverage_percentage_90 <- (coverage_count_90 / total_rows) * 100
+coverage_percentage_80 <- (coverage_count_80 / total_rows) * 100
+
+# Create new columns in the dataframe to store the coverage percentages
+prob_bootstrap_df$`95` <- coverage_percentage_95
+prob_bootstrap_df$`90` <- coverage_percentage_90
+prob_bootstrap_df$`80` <- coverage_percentage_80
+
+# Calculate the number of times Value falls within the 95% confidence interval
+coverage_count_95 <- sum(prob_delta_df$value >= prob_delta_df$Lower_Conf_95 & 
+                         prob_delta_df$value <= prob_delta_df$Upper_Conf_95)
+
+# Calculate the number of times Value falls within the 90% confidence interval
+coverage_count_90 <- sum(prob_delta_df$value >= prob_delta_df$Lower_Conf_90 & 
+                         prob_delta_df$value <= prob_delta_df$Upper_Conf_90)
+
+# Calculate the number of times Value falls within the 85% confidence interval
+coverage_count_80 <- sum(prob_delta_df$value >= prob_delta_df$Lower_Conf_80 & 
+                         prob_delta_df$value <= prob_delta_df$Upper_Conf_80)
+
+# Calculate the total number of rows in the dataframe
+total_rows <- nrow(prob_delta_df)
+
+# Calculate the percentage of times Value falls within each confidence interval
+coverage_percentage_95 <- (coverage_count_95 / total_rows) * 100
+coverage_percentage_90 <- (coverage_count_90 / total_rows) * 100
+coverage_percentage_80 <- (coverage_count_80 / total_rows) * 100
+
+# Create new columns in the dataframe to store the coverage percentages
+prob_delta_df$`95` <- coverage_percentage_95
+prob_delta_df$`90` <- coverage_percentage_90
+prob_delta_df$`80` <- coverage_percentage_80
+
+
+```
+
+
+

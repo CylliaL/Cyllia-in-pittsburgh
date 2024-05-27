@@ -1,0 +1,106 @@
+
+
+```{r}
+glm.binomial <- glm( Owns.Term.Life ~ as.factor(education) + hhsize + log(income) + sqrt(age), data= Quiz4Data, family= 'binomial' )
+summary( glm.binomial )
+beta.binom <- coef(  glm.binomial  )
+
+beta.binom 
+```
+
+```{r}
+beta.binom[3]
+```
+
+```{r}
+exp(beta.binom[3])
+```
+```{r}
+# Define colors
+Pitt.Blue<- "#003594"
+Pitt.Gold<-"#FFB81C"
+Pitt.DGray <- "#75787B"
+Pitt.Gray <- "#97999B"
+Pitt.LGray <- "#C8C9C7"
+# ggplot preferences
+library("ggplot2")
+library("repr")
+options(repr.plot.width=10, repr.plot.height=10/1.68)
+Pitt.Theme<-theme( panel.background = element_rect(fill = "white", linewidth = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(linewidth = 0.5, linetype = 'solid', colour =Pitt.Gray), 
+  panel.grid.minor = element_line(linewidth = 0.25, linetype = 'solid', colour = "white")
+)
+base<- ggplot() +aes()+ Pitt.Theme
+```
+
+
+
+```{r}
+# Probit regression
+glm.probit <- glm(Owns.Term.Life ~ as.factor(education) + hhsize + log(income) + sqrt(age),
+                  data = Quiz4Data, family = binomial(link = "probit"))
+
+# Compare models
+logLik(glm.binomial)
+logLik(glm.probit)
+```
+
+```{r}
+# Install and load the margins package if not already done
+# install.packages("margins")
+library(margins)
+
+# Calculate the average marginal effect of household size
+avg_marginal_effect <- margins(glm.binomial, variables = "hhsize", type = "response")
+
+# Summarize the average marginal effect
+summary_marginal_effect <- summary(avg_marginal_effect)
+
+# Print the average marginal effect
+cat("Average Marginal Effect of Household Size:", summary_marginal_effect[,"AME"], "\n")
+```
+
+
+```{r}
+# Create a data frame with the specified scenarios
+age_range <- seq(20, 70, by = 1)
+df <- data.frame(
+  age = age_range,
+  education = rep(c("college", "hs"), each = length(age_range)),
+  hhsize = rep(4, 2 * length(age_range)),
+  income = rep(c(110000, 60000), each = length(age_range))
+)
+
+# Predict probabilities for each scenario
+df$probability <- predict(glm.binomial, newdata = df, type = "response")
+
+# Create the graph using ggplot2
+library(ggplot2)
+
+ggplot(df, aes(x = sqrt(age), y = probability, color = education)) +
+  geom_line(size = 1) +
+  scale_color_manual(values = c("college" = "blue", "hs" = "red"),
+                     labels = c("College-educated, Income: $110,000", "High-school-educated, Income: $60,000")) +
+  labs(x = "Square Root of Age", y = "Probability of Owning Term-Life Insurance",
+       title = "Probability of Owning Term-Life Insurance by Age",
+       subtitle = "Household Size: 4") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        legend.title = element_blank(),
+        legend.position = "bottom")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+

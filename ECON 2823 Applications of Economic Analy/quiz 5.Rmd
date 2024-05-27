@@ -1,0 +1,213 @@
+
+
+
+```{r}
+# Assuming the data is already loaded into a data frame called 'rating'
+
+# Calculate the average rating for each agent
+agent_avg_ratings <- aggregate(rating.val ~ agent.id, data = rating.data, FUN = mean)
+
+# Find the agent ID with the worst average rating
+worst_agent <- agent_avg_ratings$agent.id[which.min(agent_avg_ratings$rating.val)]
+
+# Find the agent ID with the best average rating
+best_agent <- agent_avg_ratings$agent.id[which.max(agent_avg_ratings$rating.val)]
+
+# Print the results
+cat("Agent ID with the worst average rating:", worst_agent, "\n")
+cat("Agent ID with the best average rating:", best_agent, "\n")
+```
+
+```{r}
+# Assuming the data is already loaded into a data frame called 'rating'
+
+# Create a dummy variable for the type of caller
+rating.data$is_corporate <- ifelse(rating.data$type == "corporate", 1, 0)
+
+# Convert agent.id to a factor variable
+rating.data$agent.id <- as.factor(rating.data$agent.id)
+
+# Run the ordered logit regression
+library(MASS)
+model_logit <- polr(as.factor(rating.val) ~ is_corporate + log(call.duration) + agent.id, data = rating.data, method = "logistic")
+
+# Run the ordered probit regression
+model_probit <- polr(as.factor(rating.val) ~ is_corporate + log(call.duration) + agent.id, data = rating.data, method = "probit")
+
+# Compare the models using AIC and BIC
+logit_aic <- AIC(model_logit)
+logit_bic <- BIC(model_logit)
+probit_aic <- AIC(model_probit)
+probit_bic <- BIC(model_probit)
+
+# Print the results
+cat("Ordered Logit AIC:", logit_aic, "\n")
+cat("Ordered Logit BIC:", logit_bic, "\n")
+cat("Ordered Probit AIC:", probit_aic, "\n")
+cat("Ordered Probit BIC:", probit_bic, "\n")
+
+if (logit_aic < probit_aic && logit_bic < probit_bic) {
+  cat("The Ordered Logit model better fits the data.")
+} else if (probit_aic < logit_aic && probit_bic < logit_bic) {
+  cat("The Ordered Probit model better fits the data.")
+} else {
+  cat("Both models have similar fit.")
+}
+```
+```{r}
+# Assuming the data is already loaded into a data frame called 'rating'
+
+# Create a dummy variable for the type of caller
+rating.data$is_corporate <- ifelse(rating.data$type == "corporate", 1, 0)
+
+# Convert agent.id to a factor variable
+rating.data$agent.id <- as.factor(rating.data$agent.id)
+
+# Run the ordered logit regression
+library(MASS)
+model_logit <- polr(as.factor(rating.val) ~ is_corporate + log(call.duration) + agent.id, data = rating.data, method = "logistic")
+
+# Run the ordered probit regression
+model_probit <- polr(as.factor(rating.val) ~ is_corporate + log(call.duration) + agent.id, data = rating.data, method = "probit")
+
+# Compare the models using AIC and BIC
+logit_aic <- AIC(model_logit)
+logit_bic <- BIC(model_logit)
+probit_aic <- AIC(model_probit)
+probit_bic <- BIC(model_probit)
+
+# Choose the best-fitting model based on AIC and BIC
+if (logit_aic < probit_aic && logit_bic < probit_bic) {
+  best_model <- model_logit
+  cat("The Ordered Logit model is selected as the best-fitting model.\n")
+} else {
+  best_model <- model_probit
+  cat("The Ordered Probit model is selected as the best-fitting model.\n")
+}
+
+# Interpret the coefficients of the best-fitting model
+coef_call_duration <- coef(best_model)["log(call.duration)"]
+coef_is_corporate <- coef(best_model)["is_corporate"]
+
+if (coef_call_duration > 0) {
+  cat("Longer calls increase the expected rating.\n")
+} else {
+  cat("Longer calls decrease the expected rating.\n")
+}
+
+if (coef_is_corporate > 0) {
+  cat("A corporate caller increases the expected rating.\n")
+} else {
+  cat("A corporate caller decreases the expected rating.\n")
+}
+```
+
+```{r}
+# Assuming the best-fitting model is stored in the variable 'best_model'
+
+# Get the coefficients of the agent ID factor variable
+agent_coefficients <- coef(best_model)[grepl("^agent\\.id", names(coef(best_model)))]
+
+# Find the agent with the lowest coefficient (worst agent)
+worst_agent <- names(agent_coefficients)[which.min(agent_coefficients)]
+worst_agent <- gsub("agent\\.id", "", worst_agent)
+
+# Find the agent with the highest coefficient (best agent)
+best_agent <- names(agent_coefficients)[which.max(agent_coefficients)]
+best_agent <- gsub("agent\\.id", "", best_agent)
+
+# Print the results
+cat("The worst agent is:", worst_agent, "\n")
+cat("The best agent is:", best_agent, "\n")
+```
+
+```{r}
+# Assuming the best-fitting model is stored in the variable 'best_model'
+
+# Create a data frame with the specified values for prediction
+new_data <- data.frame(
+  is_corporate = 0,  # Non-corporate caller
+  call.duration = 5,  # Call duration of 5 minutes
+  agent.id = factor("7")  # Agent-7 as a factor level
+)
+
+# Calculate the probabilities for each rating category
+probabilities <- predict(best_model, newdata = new_data, type = "probs")
+
+# Extract the probabilities for "Very Bad" and "Bad" ratings
+very_bad_prob <- probabilities[1]
+bad_prob <- probabilities[2]
+
+# Calculate the total probability of "Very Bad" or "Bad" rating
+total_prob <- very_bad_prob + bad_prob
+
+# Print the result
+cat("The probability that Agent-7 has a 'Very Bad' or 'Bad' rating for a 5-minute non-corporate caller is:", round(total_prob, 4), "\n")
+```
+
+```{r}
+# Assuming the best-fitting model is stored in the variable 'best_model'
+
+# Filter the data for Agents 4, 9, and 10
+second_tier_data <- rating.data[rating.data$agent.id %in% c("4", "9", "10"), ]
+
+# Calculate the average call duration and caller type for second-tier agents
+avg_call_duration <- mean(second_tier_data$call.duration)
+avg_is_corporate <- mean(second_tier_data$is_corporate)
+
+# Create a data frame with the average values for prediction
+new_data <- data.frame(
+  is_corporate = avg_is_corporate,
+  call.duration = avg_call_duration,
+  agent.id = factor("7")  # Agent-7 as a factor level
+)
+
+# Predict the average rating for Agent-7 with second-tier caller types
+predicted_rating <- predict(best_model, newdata = new_data, type = "class")
+
+# Print the result
+cat("The predicted average rating for Agent-7 if she faced the second-tier caller types is:", predicted_rating, "\n")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
