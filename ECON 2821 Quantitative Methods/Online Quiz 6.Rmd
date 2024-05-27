@@ -1,0 +1,33 @@
+---
+title: "Quiz"
+author: "Cyllia"
+date: "2023-10-02"
+output: html_document
+---
+
+```{r}
+wages <- read.csv("Wages.csv")
+```
+
+```{r}
+wages$FEMALE <- ifelse(wages$Gender == "female", 1, 0)
+
+reg.1 <-lm(data=wages, WAGE ~ EDUCATION + EXPERIENCE + FEMALE + FEMALE*EXPERIENCE)
+summary(reg.1)
+```
+
+```{r}
+reg.1 <-lm(data=wages, WAGE ~ EDUCATION + EXPERIENCE + FEMALE + FEMALE*EXPERIENCE)
+summary(reg.1)
+```
+
+
+
+
+
+
+
+
+
+
+

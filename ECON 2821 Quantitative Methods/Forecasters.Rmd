@@ -1,0 +1,48 @@
+---
+title: "Untitled"
+author: "Cyllia"
+date: "2023-09-30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+forecaster <- read.csv("forecastersdata.csv")
+```
+
+
+###Q1
+```{r}
+reg.1 <-lm(data=forecaster, Actual.Price ~ Taylor)
+summary(reg.1)
+```
+```{r}
+reg.2 <-lm(data=forecaster, Actual.Price ~ Rose)
+summary(reg.2)
+```
+```{r}
+reg.3 <-lm(data=forecaster, Actual.Price ~ Hazel)
+summary(reg.3)
+```
+
+##Q2
+```{r}
+reg.4 <-lm(data=forecaster, Actual.Price ~ Hazel+Rose)
+summary(reg.4)
+```
+```{r}
+reg.5 <-lm(data=forecaster, Actual.Price ~ Hazel+Taylor)
+summary(reg.5)
+```
+
+```{r}
+reg.6 <-lm(data=forecaster, Actual.Price ~ Rose+Taylor)
+summary(reg.6)
+```
+```{r}
+reg.7 <-lm(data=forecaster, Actual.Price ~ Rose+Taylor+Hazel)
+summary(reg.7)
+```

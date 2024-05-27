@@ -1,0 +1,108 @@
+---
+title: "Class 7"
+author: "Cyllia"
+date: "2023-09-21"
+output: html_document
+---
+```{r}
+library(tidyverse)
+library(dplyr)
+```
+```{r}
+###The following tries to avoid scientific notation
+options(scipen = 1) 
+```
+
+```{r}
+### load the data (use correct directory)
+housedata <- read.csv("housedata.csv")
+```
+
+```{r}
+### name the variables
+Income <- housedata$Income
+Price <- housedata$Price
+```
+
+```{r}
+### quick scatterplot
+qplot(x=Income,y=Price)
+```
+
+```{r}
+### linear regression model
+reg.1 <-lm(Price ~ Income)
+print(summary(reg.1),digits=3)
+```
+```{r}
+### confidence intervals for intercept and slope
+print(confint(reg.1,level = 0.95),digits=3)
+```
+
+```{r}
+### plot regression line and data
+ggplot(housedata, aes(Income, Price)) + geom_point() + geom_smooth(method = "lm", se=FALSE)
+```
+
+```{r}
+### predictions/forecasts for income=50000,75000,1000000
+## create the X values
+newIncome <- data.frame(Income=c(50000,75000,1000000))
+## Prediction with Confidence Intervals
+predict(reg.1,newIncome, interval = "prediction", level=0.95)
+```
+
+```{r}
+### Calculate the SE of Prediction
+## calculate from scratch as SE of line + SE of regression 
+fcsts <- predict(reg.1,newIncome, interval = "prediction",se.fit =T, level=0.95)
+sqrt((fcsts$se.fit)^2+(fcsts$residual.scale)^2)
+```
+
+```{r}
+####Pictures
+# 1. Add predicted confidence band values 
+pred.int <- predict(reg.1, interval = "prediction")
+mydata <- cbind(housedata, pred.int)
+```
+```{r}
+# 2. Regression line + band + prediction interval 
+ggplot(mydata, aes(Income, Price)) + geom_point() + geom_line(aes(y=fit),color="blue") +
+  geom_smooth(method=lm,se=TRUE)+ geom_line(aes(y=lwr),color="red")+geom_line(aes(y=upr),color="red")
+```
+
+```{r}
+italydata <- read.csv("world_italy.csv")
+```
+```{r}
+### name the variables
+worldr <- italydata$World.return
+Italyr <- italydata$Italy.return
+```
+
+```{r}
+### linear regression model
+reg.1 <-lm(Italyr ~ worldr)
+print(summary(reg.1),digits=3)
+```
+```{r}
+### confidence intervals for intercept and slope
+print(confint(reg.1,level = 0.99),digits=3)
+```
+```{r}
+## create the X values
+newworld <- data.frame(worldr=-0.01)
+```
+```{r}
+## Prediction with Confidence Intervals
+predict(reg.1,newworld, interval = "prediction", level=0.95)
+```
+
+```{r}
+fcsts <- predict(reg.1,newworld, interval = "prediction",se.fit =T, level=0.95)
+fcsts
+```
+
+
+
+

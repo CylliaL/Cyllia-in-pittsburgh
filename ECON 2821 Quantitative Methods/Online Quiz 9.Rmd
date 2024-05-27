@@ -1,0 +1,116 @@
+---
+title: '9'
+author: "Cyllia"
+date: "2023-10-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(tidyverse)
+library(jtools)
+```
+```{r}
+W <- read.csv("Westland.csv")
+```
+```{r}
+reg.1 <-lm(data=W, PriceSixMonths ~ Period)
+summary(reg.1)
+```
+```{r}
+W$logPS <- log(W$PriceSixMonths)
+```
+```{r}
+W$lag1logPS <- lag(W$logPS,n=1)
+W$lag2logPS <- lag(W$logPS,n=2)
+```
+```{r}
+predictPrice <- data.frame(lag1logPS=W$logPS[16],lag2logPS=W$lag1logPS[16],Period=17)
+```
+```{r}
+pred <- predict(reg.1, predictPrice, se.fit=T, interval = "prediction")
+pred
+```
+```{r}
+pred$SE.Fcst <- sqrt(pred$se.fit^2+pred$residual.scale^2)
+pred$SE.Fcst
+```
+```{r}
+Forecast.PS <- c(Prediction=pred$fit[1],Lower95=pred$fit[2],Upper95=pred$fit[3],SE_pred=pred$SE.Fcst,Res.SE=pred$residual.scale)
+print(Forecast.PS,digits=3)
+```
+
+###Q4
+
+```{r}
+reg.2 <-lm(data=W, PriceSixMonths ~ Period + PriceNow)
+summary(reg.2)
+```
+```{r}
+predictPriceN <- data.frame(lag1logPS=W$logPS[16],lag2logPS=W$lag1logPS[16], PriceNow=W$PriceNow[17], Period=17)
+```
+```{r}
+pred <- predict(reg.2, predictPriceN,se.fit=T, interval = "prediction")
+pred
+```
+```{r}
+pred$SE.Fcst <- sqrt(pred$se.fit^2+pred$residual.scale^2)
+pred$SE.Fcst
+```
+```{r}
+Forecast.PS <- c(Prediction=pred$fit[1],Lower95=pred$fit[2],Upper95=pred$fit[3],SE_pred=pred$SE.Fcst,Res.SE=pred$residual.scale)
+print(Forecast.PS,digits=3)
+```
+
+###Q5
+```{r}
+W$logPriceNow <- log(W$PriceNow)
+```
+
+```{r}
+reg.3 <-lm(data=W, PriceSixMonths ~ Period + logPriceNow)
+summary(reg.3)
+```
+```{r}
+predictPricelogN <- data.frame(lag1logPS=W$logPS[16],lag2logPS=W$lag1logPS[16], logPriceNow=W$logPriceNow[17], Period=17)
+```
+```{r}
+pred <- predict(reg.3, predictPricelogN,se.fit=T, interval = "prediction")
+pred
+pred$SE.Fcst <- sqrt(pred$se.fit^2+pred$residual.scale^2)
+pred$SE.Fcst
+```
+```{r}
+Forecast.PS <- c(Prediction=pred$fit[1],Lower95=pred$fit[2],Upper95=pred$fit[3],SE_pred=pred$SE.Fcst,Res.SE=pred$residual.scale)
+print(Forecast.PS,digits=3)
+```
+###Q6
+```{r}
+W$logPriceSixMonthsSimilar <- log(W$PriceSixMonthsSimilar)
+W$laglogPriceSixMonthsSimilar <- lag(W$logPriceSixMonthsSimilar)
+```
+
+```{r}
+reg.4 <-lm(data=W, PriceSixMonths ~ Period + logPriceNow + laglogPriceSixMonthsSimilar)
+summary(reg.4)
+```
+```{r}
+predictPricelogNS <- data.frame(lag1logPS=W$logPS[16],lag2logPS=W$lag1logPS[16], logPriceNow=W$logPriceNow[17], laglogPriceSixMonthsSimilar = W$laglogPriceSixMonthsSimilar[17], Period=17)
+```
+```{r}
+pred <- predict(reg.4, predictPricelogNS,se.fit=T, interval = "prediction")
+pred
+pred$SE.Fcst <- sqrt(pred$se.fit^2+pred$residual.scale^2)
+pred$SE.Fcst
+```
+
+
+
+
+
+
+

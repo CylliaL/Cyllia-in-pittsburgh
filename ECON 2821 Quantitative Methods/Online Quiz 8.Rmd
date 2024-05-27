@@ -1,0 +1,84 @@
+---
+title: '8'
+author: "Cyllia"
+date: "2023-10-09"
+output: html_document
+---
+```{r}
+install.packages("jtools")
+```
+
+```{r}
+library(tidyverse)
+library(jtools)
+```
+
+
+```{r}
+AQ <- read.csv("AmazonQuarterlyRevenues_2021_Data.csv")
+```
+
+```{r}
+qplot(AQ$Period,AQ$QR)
+```
+
+```{r}
+logQR <- log(AQ$QR)
+logQR
+```
+
+```{r}
+qplot(AQ$Period,logQR)
+```
+
+```{r}
+reg.QR <-lm(data=AQ, QR ~ Period)
+summary(reg.QR)
+```
+
+```{r}
+confint(reg.QR,'Period',level=0.8)
+```
+
+```{r}
+pred1 <- data.frame(Period = 83)
+predict(reg.1, pred1, interval="prediction",level=0.95)
+```
+```{r}
+reg.2 <-lm(data=AQ, lagQR ~ Period)
+summary(reg.2)
+```
+
+```{r}
+reg.logQR <-lm(data=AQ, logQR ~ Period)
+summ(reg.logQR)
+```
+```{r}
+confint(reg.logQR,'Period',level=0.95)
+```
+
+```{r}
+predlogQR <- data.frame(Period = 83)
+predict(reg.logQR, predlogQR, interval="prediction",level=0.95)
+```
+```{r}
+exp(11.41659)
+exp(12.14329)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

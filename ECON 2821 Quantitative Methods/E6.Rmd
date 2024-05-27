@@ -1,0 +1,72 @@
+---
+title: "Untitled"
+author: "Cyllia"
+date: "2023-09-28"
+output: html_document
+---
+```{r}
+library(tidyverse)
+library(dplyr)
+```
+
+##Q1
+```{r}
+computer <- read.csv("computersales.csv")
+```
+
+```{r}
+Xbar <- mean(computer$sales)
+Xbar
+```
+```{r}
+sd <- sd(computer$sales)
+sd
+```
+```{r}
+se <- sd/sqrt(36)
+se
+```
+```{r}
+t.test(computer$sales,mu=275,alternative = "less")
+```
+```{r}
+t.test(computer$sales,mu=285,alternative = "less")
+```
+```{r}
+t.test(computer$sales,mu=280)
+```
+##Q2
+
+```{r}
+SE2 <- 6/sqrt(260)
+SE2
+```
+```{r}
+(8.6-10.1)/SE2
+```
+
+##Q3
+```{r}
+bakery <- read.csv("bakery.csv")
+```
+
+```{r}
+mean(bakery$Weekend)
+```
+```{r}
+t.test(bakery$Weekend,mu=325)
+```
+
+```{r}
+t.test(bakery$Weekend,mu=325, alternative = "less")
+```
+```{r}
+t.test(bakery$Weekend,mu=312, alternative = "less")
+```
+##Q4
+```{r}
+AB <- read.csv("A_B_testing.csv")
+```
+
+
+

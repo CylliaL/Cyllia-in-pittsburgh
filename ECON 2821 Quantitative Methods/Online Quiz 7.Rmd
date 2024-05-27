@@ -1,0 +1,39 @@
+---
+title: "online"
+author: "Cyllia"
+date: "2023-10-04"
+output: html_document
+---
+
+```{r}
+
+```
+
+```{r}
+AJ <- read.csv("Applejuice.csv")
+InvPrice <- 1/AJ$Price
+reg.1 <-lm(data=AJ, Sales ~ InvPrice)
+summary(reg.1)
+```
+
+```{r}
+confint(reg.1,'InvPrice',level=0.99)
+```
+
+```{r}
+pred1 <- data.frame(InvPrice = 1/2.5)
+predict(reg.1, pred1, interval="prediction",level=0.99)
+```
+
+
+```{r}
+logSales <- log(AJ$Sales)
+reg.2 <-lm(data=AJ, logSales ~ Price)
+summary(reg.2)
+```
+```{r}
+pred2 <- data.frame(Price = 2.5)
+predict(reg.2, pred2, interval="prediction",level=0.99)
+```
+
+

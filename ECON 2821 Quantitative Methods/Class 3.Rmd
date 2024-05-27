@@ -1,0 +1,77 @@
+---
+title: "Class 3"
+author: "Cyllia"
+date: "2023-09-18"
+output: html_document
+---
+
+
+#### Some Normal Distributions
+```{r}
+curve(dnorm(x, mean=0, sd=0.6), from = -7, to = 7)
+curve(dnorm(x, mean=-2, sd=1), add = TRUE, col = 2)
+curve(dnorm(x, mean=2, sd=1), add = TRUE, col = 3)
+curve(dnorm(x, mean=0, sd=4), add = TRUE, col = 4)
+curve(dnorm(x, mean=0, sd=1), add = TRUE, col = 5)
+```
+
+#### Normal Distributions With Area
+```{r}
+mean=0; sd=1
+lb=-1; ub=1
+
+x <- seq(-4,4,length=100)*sd + mean
+hx <- dnorm(x,mean,sd)
+
+plot(x, hx, type="n", xlab="x Values", ylab="",
+     main="Normal Distribution", axes=FALSE)
+
+i <- x >= lb & x <= ub
+lines(x, hx)
+polygon(c(lb,x[i],ub), c(0,hx[i],0), col="yellow")
+
+area <- pnorm(ub, mean, sd) - pnorm(lb, mean, sd)
+
+result <- paste("P( μ\U2093 ",lb,"\U03C3\U2093 < X < μ\U2093 +",ub,"\U03C3\U2093 ) = ",signif(area, digits=3))
+
+mtext(result,3)
+axis(1, pos=0, at=seq(-4, 4, 1), labels = expression("",mu[X]-3*sigma[x], mu[x]-2*sigma[x], mu[x]-sigma[x], mu[x], mu[x]+sigma[x], mu[x]+2*sigma[x], mu[x]+3*sigma[x],""))
+```
+
+
+#### t-distributions
+```{r}
+x <- seq(-4, 4, length=100)
+hx <- dnorm(x)
+
+degf <- c(1, 3, 8, 30)
+colors <- c("red", "blue", "darkgreen", "gold", "black")
+labels <- c("df=1", "df=3", "df=8", "df=30", "normal")
+
+plot(x, hx, type="l", lty=2, xlab="x value",
+     ylab="Density", main="Comparison of t Distributions")
+
+for (i in 1:4){
+  lines(x, dt(x,degf[i]), lwd=2, col=colors[i])
+}
+
+legend("topright", inset=.05, title="Distributions",
+       labels, lwd=2, lty=c(1, 1, 1, 1, 2), col=colors)
+```
+
+#### Chi Square distributions
+```{r}
+colors <- c("red", "blue", "darkgreen", "gold", "pink", "black")
+labels <- c("df=1", "df=2", "df=3", "df=4", "df=5", "df=6")
+
+plot(curve(dchisq(x,6), from=0, to=10), type="l", lwd=3, xlab="x value",
+     ylab="Density", main="Comparison of Chi Square Distributions", ylim=c(0,1))
+     
+for(i in 1:5) curve(dchisq(x,i), add=T, from=0, to=10, lwd=3, col=colors[i])
+
+legend("topright", inset=.05, title="Distributions",
+       labels, lwd=3, col=colors)
+```
+
+
+

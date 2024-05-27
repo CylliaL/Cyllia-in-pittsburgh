@@ -1,0 +1,31 @@
+---
+title: "Class 8"
+author: "Cyllia"
+date: "2023-09-25"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(stargazer)
+options(scipen = 1) 
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

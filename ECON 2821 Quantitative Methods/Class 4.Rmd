@@ -1,0 +1,80 @@
+---
+title: "Untitled"
+author: "Cyllia"
+date: "2023-09-18"
+output: html_document
+---
+
+##### Data
+```{r}
+AWTP <- read.csv("AWTP_MQE2023.csv")
+awtp <- AWTP$Q1
+```
+
+##### Calculate Sample size
+```{r}
+n<-length(awtp)
+n
+```
+
+##### Calculate Sample Mean
+```{r}
+Xbar <- mean(awtp)
+Xbar
+```
+
+##### Calculate Sample Variance
+```{r}
+S2 <- var(awtp)
+S2
+```
+##### Calculate Sample Standard Deviation
+```{r}
+S <- sd(awtp)
+S
+```
+##### Calculate Standard Error of Xbar
+```{r}
+seXbar <- S/sqrt(n)
+seXbar
+```
+###### Find a 95% confidence interval for the sample mean
+##compute critical value for two-sided 95% confidence interval:
+##need to use t-distribution with n-1 degrees of freedom, 
+##so command qt for the .975 lowertail:
+```{r}
+cv <- qt(.975, df=n-1)   
+cv
+```
+## if we just want to use 1-2-3 rule, we could just set cv <- 2
+## if we know the population standard deviation set cv <- qnorm(.975)
+#compute two-sided confidence interval *c(-1,1) for +/-:
+```{r}
+CI <- Xbar+cv*seXbar*c(-1,1)
+CI
+```
+#alternatively, can use t.test command (but that is no fun):
+```{r}
+t.test(awtp, conf.level=0.95)
+```
+###### What is the probability that average awtp is larger than $15
+```{r}
+1-pnorm(15,Xbar,seXbar)
+```
+```{r}
+p <- pnorm(3.05, 2.9, 0.2/5) - pnorm(2.95, 2.9, 0.2/5)
+p
+1-p
+
+```
+```{r}
+mean(c(40, 55, 60, 90, 30, 50, 150, 100, 90, 80))
+var(c(40, 55, 60, 90, 30, 50, 150, 100, 90, 80))
+```
+
+```{r}
+data <- read.csv("Digital_Services_AWTP.csv")
+data
+```
+
+
