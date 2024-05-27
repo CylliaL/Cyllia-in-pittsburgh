@@ -1,0 +1,104 @@
+---
+title: "PS3Q3"
+author: "Cyllia"
+date: "2024-02-08"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r}
+source("create_monthly_price.R")
+source("model_selection_function.R")
+source("ols_function.R")
+source("t_test_function.R") 
+source("generate_data_functions.R")
+library("quantmod") 
+```
+
+(a) Compile quarterly data for the U.S. GNP between 1947Q1 and 2023Q1.
+```{r}
+getSymbols(Symbols ="GNP",src = "FRED")
+```
+(b) Compute quarterly GNP growth and filter the data to only include observations between 1960Q1 and 2019Q4. Provide summary statistics of the filtered quarterly GNP growth and plot the data.
+```{r}
+head(GNP)
+tail(GNP)
+
+GNP = as.matrix(GNP[,1])
+n_GNP = dim(GNP)[1]
+GNP= as.matrix(GNP[5:n_GNP,1]/GNP[1:(n_GNP-4),1] - 1)
+```
+```{r}
+keep_data <- seq(from = as.Date("1964-04-01"), to = as.Date("2019-10-01"), by = "quarter")
+
+GNP_G = as.matrix(GNP[as.Date(rownames(GNP)) %in% keep_data,])
+n_obs = dim(GNP_G)[1]
+date = as.Date(row.names(GNP_G))
+
+plot(x = date, y = GNP_G, xlab='time',ylab='GNP Growth',type='l',col="black")
+```
+```{r}
+summary(GNP_G)
+```
+(c) i. Compute and plot empirical autocorrelation function (ACF). Given the plot, do you expect any time-series correlation among the observations? Explain why?
+
+ii. Set the maximum number of lags to the integer closest to the number of observations to the power one over third. Perform a test of joint autocorrelation in GNP growth and report your result. Is your finding consistent with that of the ACF plot? Explain why?
+
+```{r}
+acf(GNP_G, lag = round(n_obs^(1/3)))
+```
+
+## Yes, because all the the bars extend beyond the dotted lines.
+
+```{r}
+Box.test(GNP_G, lag = round(n_obs^(1/3)), type = "Ljung-Box")
+```
+## Reject the null hypothesis
+
+
+(d) i. Compute and plot partial autocorrelation function (PACF). Given the plot, how many lags you would select for an AR process? Explain why?
+
+ii. Use AIC and BIC to determined the number of lags for an AR process. Compare your findings with that of the PACF plot.
+
+```{r}
+pacf(GNP_G, lag = round(n_obs^(1/3)), main = "GNP Grpwth")
+```
+```{r}
+results <- model_selection(n_obs^(1/3),GNP_G)
+aic_values = results$AIC
+bic_values = results$BIC
+num_lags_aic = results$op_lag_AIC  
+num_lags_bic = results$op_lag_BIC
+num_lags_aic
+```
+(e) i. Consider an AR model with the number of lags selected by AIC. Estimate the coefficients of the AR model and compute the theoretical autocorrelation functions. Compare your findings with that of Part 3c.
+
+ii. Perform a joint test of autocorrelation among the residuals of the estimated model and report your result.
+
+```{r}
+max_lags <- round(n_obs^(1/3))
+sel_result_GNP = model_selection(max_lags,GNP_G)
+num_lag_GNP = results$op_lag_AIC
+
+lags_GNP <- matrix(NA, nrow = n_obs, ncol = num_lag_GNP)
+for (j in 1:num_lag_GNP) {
+  lags_GNP[(j+1):n_obs,j] <- GNP_G[1:(n_obs-j),1] 
+}
+intercept = matrix(1,n_obs)
+X = cbind(intercept,lags_GNP)
+y = GNP_G
+reg_result = ols(X[(num_lag_GNP+1):n_obs,],as.matrix(y[(num_lag_GNP+1):n_obs,1]))
+residuals = reg_result$u_hat # get the AR model residuals
+
+beta_hat =  reg_result$beta_hat
+beta_hat
+
+Box.test(residuals, lag = round(n_obs^(1/3)), type = "Ljung-Box")
+```
+## Cannot reject the null hypothesis.
+
+
+
+
+

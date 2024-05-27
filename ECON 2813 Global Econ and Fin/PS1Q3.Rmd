@@ -1,0 +1,78 @@
+---
+title: "Untitled"
+author: "Cyllia"
+date: "2024-01-23"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+```{r}
+library("quantmod") # add quantmod to the list of Packages
+source("generate_data_functions.R") # add functions from the local R file named generate_data_functions.R
+source("ols_function.R") # add functions from the local R file named ols_function.R
+source("t_test_function.R") # add functions from the local R file named t_test_function.R
+```
+
+##(a) Compile quarterly data for the U.S. real gross private domestic investment (DI) from 1947Q1 to 2023Q4.
+```{r}
+getSymbols(Symbols ="GPDI",src = "FRED", from = '1947/01/01')
+qua_di <- as.matrix(GPDI[,1])
+qua_di_date = as.Date(row.names(qua_di))
+n_obs_qua_di = length(qua_di_date)
+```
+##(b) Compute growth in quarterly DI (GDI), provide its summary statistics and plot the data.
+```{r}
+di_return <- diff(qua_di)/qua_di[1:n_obs_qua_di-1,1]
+di_return_date = qua_di_date[2:n_obs_qua_di]
+n_obs_qua_return = length(di_return_date)
+
+plot(di_return, type = "l", col = "darkblue", main = "Growth in Quarterly GDI", ylab = "GDI Growth")
+```
+
+
+
+##(c) Compute and plot empirical autocorrelation function. Given the plot, do you expect any time-series correlation among the observations? Explain why?
+```{r}
+acf(di_return,lag=round(n_obs_qua_return^(1/3)))
+
+ACF=acf(di_return,lag=round(n_obs_qua_return^(1/3)), plot = FALSE)
+ACF$acf
+```
+
+
+Yes I do expect some time-series correlation among the observations. Because there are some lags where the bars extend beyond the dotted lines.
+
+##(d) Set the maximum number of lags to the integer closest to the number of observations to the power one-third. Perform a test for joint autocorrelation in GDI and report your result. Does your finding consistent with that of Part 3c? Explain why?
+```{r}
+t_ratio <- ACF$acf[2]*sqrt(n_obs_qua_return) 
+t_ratio
+
+Box.test(di_return, lag = round(n_obs_qua_return^(1/3)), type = "Ljung-Box") 
+Box.test(di_return, lag = round(n_obs_qua_return^(1/3)), type = "Box-Pierce")
+```
+
+##(e) Consider an AR(1) model and compute the theoretical autocorrelation function. Compare your findings with that of Part 3c.
+```{r}
+lag_di_return = rbind(NA, as.matrix(di_return[1:(n_obs_qua_return-1),1]))
+intercept = matrix(1,n_obs_qua_return)
+X = cbind(intercept,lag_di_return)
+y = di_return
+reg_result = ols(X[2:n_obs_qua_return,],as.matrix(y[2:n_obs_qua_return,1]))
+1 - sum(reg_result$u_hat^2)/sum(y^2)
+beta_hat = reg_result$beta_hat
+beta_hat
+var_beta_hat = reg_result$var_beta_hat
+test_result = t_test(beta_hat,var_beta_hat)
+test_result$t_stat
+test_result$p_value
+```
+```{r}
+ar_coeff <- as.numeric(beta_hat[2])
+ma_coeff <- 0
+TACF <- ARMAacf(ar_coeff, ma_coeff, lag.max = round(n_obs_qua_return^(1/3))) 
+plot(c(0:round(n_obs_qua_return^(1/3))),ACF$acf,type='l',xlab='Lag',ylab='ACF',ylim=c(-0.1,1))
+lines(0:round(n_obs_qua_return^(1/3)),TACF,lty=2)
+grid(nx = 4, ny = 4)
+```
+

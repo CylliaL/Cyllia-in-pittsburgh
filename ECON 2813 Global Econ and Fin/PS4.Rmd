@@ -1,0 +1,224 @@
+---
+title: "Untitled"
+author: "Cyllia"
+date: "2024-02-20"
+output: word_document
+---
+```{r}
+source("create_monthly_price.R")
+source("model_selection_function.R") # function for model selection
+source("ols_function.R")
+source("t_test_function.R") 
+source("generate_data_functions.R")
+source("expanding_window_forecast_function.R") # function for forecasting using expanding windows
+source("rolling_window_forecast_function.R") # function for forecasting using rolling windows
+library("quantmod") 
+# install.packages("fBasics")
+library("fBasics")
+```
+
+# Fetch Data
+```{r}
+getSymbols(Symbols ="GNP",src = "FRED",warnings = FALSE)
+```
+```{r}
+Y <- as.matrix(GNP[,1])
+DY <- diff(Y)/Y[1:(dim(Y)[1]-1),]
+head(DY)
+tail(DY)
+
+keep_data <- seq(from = as.Date("1960-01-01"), to = as.Date("2019-10-1"), by = "quarter")
+Y_new = as.matrix(Y[as.Date(rownames(Y)) %in% keep_data,]) # precovid data
+DY_new = as.matrix(DY[as.Date(rownames(DY)) %in% keep_data,])
+colnames(DY_new) = "GNP Growth"
+n_obs = dim(DY_new)[1]
+DY_new_date = as.Date(row.names(DY_new))
+
+plot(x = DY_new_date, y = DY_new,xlab='time',ylab='GNP Growth',type='l',col="black")
+basicStats(DY_new)
+
+acf(DY_new,lag=round(n_obs^(1/3))) # command to obtain sample ACF of the data
+
+Box.test(DY_new, lag = round(n_obs^(1/3)), type = "Ljung-Box") # applying Ljung and Box (1978) joint test of auto correlations
+
+pacf(DY_new,lag=round(n_obs^(1/3)),main="GNP Growth") # command to obtain sample PACF of the data
+```
+
+# select the number of lags and model checking
+```{r}
+results <- model_selection(round(n_obs^(1/3)),DY_new)
+aic_values = results$AIC
+bic_values = results$BIC
+num_lags_aic = results$op_lag_AIC  
+num_lags_bic = results$op_lag_BIC
+num_lags_aic
+num_lags_bic
+
+num_lags = num_lags_aic
+lags_DY_new = matrix(NA,nrow = n_obs, ncol = num_lags)
+for (i in 1:num_lags) {
+  lags_DY_new[(i+1):n_obs,i] = as.matrix(DY_new[1:(n_obs-i),1])
+}
+intercept = matrix(1,n_obs)
+X = cbind(intercept,lags_DY_new)
+y = DY_new
+reg_result = ols(X[(num_lags+1):n_obs,],as.matrix(y[(num_lags+1):n_obs,1]))
+beta_hat = reg_result$beta_hat
+
+ar_coeff <- as.numeric(beta_hat[2:(num_lags+1)])
+ma_coeff <- 0
+ACF = acf(DY_new,lag=round(n_obs^(1/3)),plot = FALSE) # command to obtain sample ACF of the data
+TACF <- ARMAacf(ar_coeff, ma_coeff, lag.max = round(n_obs^(1/3))) # command to obtain theorical ACF
+plot(c(0:round(n_obs^(1/3))),ACF$acf,type='l',xlab='Lag',ylab='ACF',ylim=c(-1,1))
+lines(0:round(n_obs^(1/3)),TACF,lty=2)
+grid(nx = 4, ny = 4)
+
+residuals = reg_result$u_hat # get the AR model residuals
+acf(residuals,lag=round(n_obs^(1/3)),main = "GNP Growth") # command to obtain sample ACF of the data
+
+Box.test(residuals, lag = round(n_obs^(1/3)), type = "Ljung-Box") # applying Ljung and Box (1978) joint test of auto correlations
+```
+
+#1. Expanding windows
+```{r}
+## Forecasting GNP growth using expanding windows
+## Using AIC
+lag_choice = NA
+init_win_len = 120 # the first 30 years
+num_step_ahead = 8 # 1 to 8 steps ahead forecastes 
+prediction_results = expanding_window(y = DY_new, init_win_len = init_win_len, pre_sel_num_lags = lag_choice, num_step_ahead = num_step_ahead, sel_method = 'aic')
+yhat_f_aic <- prediction_results$forecast
+
+y_f_aic <- prediction_results$actual_value
+
+## Plot
+plot(x = DY_new_date[121:n_obs], y = y_f_aic, xlab='time',ylab='GNP Growth',type='l',col="yellow")
+lines(x = DY_new_date[121:n_obs],y = yhat_f_aic[,1],lty=2, col = 4)
+lines(x = DY_new_date[121:n_obs],y = yhat_f_aic[,8],lty=3, col = 2)
+
+## Root mean square forecast errors
+forecast_error =  kronecker(matrix(1,ncol = num_step_ahead),y_f_aic) - yhat_f_aic
+rmsfe_ar_aic = sqrt(colMeans(forecast_error^2, na.rm = TRUE, dims = 1))
+rmsfe_ar_aic
+```
+##2. Using BIC
+```{r}
+## Forecasting GNP growth using expanding windows
+## Using BIC
+lag_choice = NA
+init_win_len = 120 # the first 8 years
+num_step_ahead = 8 # 1 to 8 steps ahead forecastes 
+prediction_results = expanding_window(y = DY_new, init_win_len = init_win_len, pre_sel_num_lags = lag_choice, num_step_ahead = num_step_ahead, sel_method = 'bic')
+yhat_f_bic <- prediction_results$forecast
+
+y_f_bic <- prediction_results$actual_value
+
+## Plot
+plot(x = DY_new_date[121:n_obs], y = y_f_bic, xlab='time',ylab='GNP Growth',type='l',col="yellow")
+lines(x = DY_new_date[121:n_obs],y = yhat_f_bic[,1],lty=2, col = 4)
+lines(x = DY_new_date[121:n_obs],y = yhat_f_bic[,8],lty=3, col = 2)
+
+## Root mean square forecast errors
+forecast_error =  kronecker(matrix(1,ncol = num_step_ahead),y_f_bic) - yhat_f_bic
+rmsfe_ar_bic = sqrt(colMeans(forecast_error^2, na.rm = TRUE, dims = 1))
+rmsfe_ar_bic
+
+## Aerage
+yhat_f_ave = (yhat_f_aic + yhat_f_bic)/2
+forecast_error =  kronecker(matrix(1,ncol = num_step_ahead),y_f_bic) - yhat_f_ave
+rmsfe_ave = sqrt(colMeans(forecast_error^2, na.rm = TRUE, dims = 1))
+rmsfe_ave
+```
+
+#3. Rolling windows
+```{r}
+## AIC
+lag_choice = NA
+init_win_len = 120 # the first 30 years
+num_step_ahead = 8 # 1 to 8 steps ahead forecastes 
+prediction_results = rolling_window(y = DY_new, init_win_len = init_win_len, pre_sel_num_lags = lag_choice, num_step_ahead = num_step_ahead, sel_method = 'aic')
+yhat_f_aic <- prediction_results$forecast
+
+y_f_aic <- prediction_results$actual_value
+
+## Plot
+plot(x = DY_new_date[121:n_obs], y = y_f_aic,xlab='time',ylab='GNP Growth',type='l',col="yellow")
+lines(x = DY_new_date[121:n_obs],y = yhat_f_aic[,1],lty=2, col = 4)
+lines(x = DY_new_date[121:n_obs],y = yhat_f_aic[,8],lty=3, col = 2)
+
+## Root mean square forecast errors
+forecast_error =  kronecker(matrix(1,ncol = num_step_ahead),y_f_aic) - yhat_f_aic
+rmsfe_ar_aic = sqrt(colMeans(forecast_error^2, na.rm = TRUE, dims = 1))
+rmsfe_ar_aic
+
+## BIC
+lag_choice = NA
+init_win_len = 120 # the first 30 years
+num_step_ahead = 8 # 1 to 24 steps ahead forecastes 
+prediction_results = rolling_window(y = DY_new, init_win_len = init_win_len, pre_sel_num_lags = lag_choice, num_step_ahead = num_step_ahead, sel_method = 'bic')
+yhat_f_bic <- prediction_results$forecast
+
+y_f_bic <- prediction_results$actual_value
+
+## Plot
+plot(x = DY_new_date[121:n_obs], y = y_f_bic,xlab='time',ylab='House Price Index Growth',type='l',col="yellow")
+lines(x = DY_new_date[121:n_obs],y = yhat_f_bic[,1],lty=2, col = 4)
+lines(x = DY_new_date[121:n_obs],y = yhat_f_bic[,8],lty=3, col = 2)
+
+forecast_error =  kronecker(matrix(1,ncol = num_step_ahead),y_f_bic) - yhat_f_bic
+rmsfe_ar_bic = sqrt(colMeans(forecast_error^2, na.rm = TRUE, dims = 1))
+rmsfe_ar_bic
+
+yhat_f_ave = (yhat_f_aic + yhat_f_bic)/2
+forecast_error =  kronecker(matrix(1,ncol = num_step_ahead),y_f_bic) - yhat_f_ave
+rmsfe_ave = sqrt(colMeans(forecast_error^2, na.rm = TRUE, dims = 1))
+rmsfe_ave
+
+rmsfe_all_rolling = rbind(rmsfe_ar_aic,rmsfe_ar_bic,rmsfe_ave)
+rmsfe_all_rolling
+```
+
+#4.
+
+```{r}
+## Forecasting using AR Model with aic selected number of lags
+lag_choice = NA
+init_win_len = 120 # the first 30 years
+num_step_ahead = 8 # 1 to 8 steps ahead forecastes 
+prediction_results = expanding_window(y = DY_new, init_win_len = init_win_len, pre_sel_num_lags = lag_choice, num_step_ahead = num_step_ahead, sel_method = 'aic')
+y_f_aic <- prediction_results$actual_value
+yhat_f_aic <- prediction_results$forecast
+selected_num_lags <- prediction_results$sel_num_lags
+
+plot(x = DY_new_date[121:n_obs], y = y_f_aic,xlab='time',ylab='GDP growth',type='l',col="yellow")
+lines(x = DY_new_date[121:n_obs],y = yhat_f_aic[,1],lty=2, col = 4)
+lines(x = DY_new_date[121:n_obs],y = yhat_f_aic[,8],lty=3, col = 2)
+
+forecast_error =  kronecker(matrix(1,ncol = num_step_ahead),y_f_aic) - yhat_f_aic
+rmsfe_ar_aic = sqrt(colMeans(forecast_error^2, na.rm = TRUE, dims = 1))
+```
+
+```{r}
+# Forecasting by Model averaging and RMSFE comparison
+yhat_f_ave = (yhat_f_aic + yhat_f_bic)/2
+forecast_error =  kronecker(matrix(1,ncol = num_step_ahead),y_f_bic) - yhat_f_ave
+rmsfe_ave = sqrt(colMeans(forecast_error^2, na.rm = TRUE, dims = 1))
+
+plot(x = DY_new_date[121:n_obs], y = y_f_bic,xlab='time',ylab='Change in number of new infected cases',type='l',col="yellow")
+lines(x = DY_new_date[121:n_obs],y = yhat_f_ave[,1],lty=2, col = 4)
+lines(x = DY_new_date[121:n_obs],y = yhat_f_ave[,7],lty=3, col = 2)
+
+rmsfe_all = rbind(rmsfe_ar_aic,rmsfe_ar_bic,rmsfe_ave)
+rmsfe_all
+```
+
+
+
+
+
+
+
+
+
+
+
